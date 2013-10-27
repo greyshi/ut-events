@@ -10,6 +10,18 @@ public class EventListActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        // Initially, a single TextView should display 'Fetching events...'
+        
+        // Make an API call to our web service to get the events
+        
+        // Translate the XML response into view(s) (TextViews with background colors
+        // and specific formatting? width=fill_parent, add side padding, length=1 or
+        // whatever weight works to fix x events on a page) The parent View for the
+        // events should be scrollable.
+        
+        // Replace the initial TextView with the new TextViews created from the
+        // data fetched from the database.
     }
 
 
