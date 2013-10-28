@@ -16,6 +16,7 @@ An android app for accessing events submitted by UT Austin students through a we
 * User defined categories
 * Calendar view
 * Calendar event export
+* Store events locally so the app can load with data
 
 
 ####Event List View
