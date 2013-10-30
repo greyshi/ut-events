@@ -94,7 +94,7 @@ public class EventListActivity extends Activity {
 			
 			response.close();
 		} else {
-			return null;
+			return new ArrayList<Event>();
 		}
 		
 		// TODO: Support XML. Unmarshall XML from responseString into Event objects and
@@ -125,7 +125,7 @@ public class EventListActivity extends Activity {
 	        	return fetchEvents();
 	        } catch (Exception e) {
 	        	// TODO: Error handling
-	        	return null;
+	        	return new ArrayList<Event>();
 	        }
 	    }
 	}
