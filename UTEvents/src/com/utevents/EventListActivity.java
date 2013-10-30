@@ -31,6 +31,8 @@ public class EventListActivity extends Activity {
 		// Initially, a single TextView should display 'Fetching events...'
 
 		// Make an API call to our web service to get the events
+		// TODO: Make the fetchEvents call run in an AsyncTask seperate from the main UI
+		//       thread.
 		try {
 			events = fetchEvents();
 		} catch (Exception e) {
