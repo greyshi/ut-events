@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class EventListActivity extends Activity {
+	
+	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,7 @@ public class EventListActivity extends Activity {
 		String responseLine;
 		StringBuilder responseString;
 		
-		URL url = new URL("http://utevents.herokuapp.com/events");
+		URL url = new URL(EVENTS_URI);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		
 		conn.setRequestMethod("GET");
@@ -100,7 +102,8 @@ public class EventListActivity extends Activity {
 		// TODO: Unmarshall XML from responseString into Event objects and stuff
 		//       those objects into events. (SAX)
 		//Xml.parse(responseString.toString(), null);
-		JSONArray jsonEvents = new JSONArray(responseString.toString());
+		JSONObject jsonResponse = new JSONObject(responseString.toString());
+		JSONArray jsonEvents = jsonResponse.getJSONArray("events");
 		for (int i = 0; i < jsonEvents.length(); ++i) {
 			JSONObject event = jsonEvents.getJSONObject(i);
 			events.add(new Event(
