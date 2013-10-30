@@ -32,7 +32,7 @@ public class EventListActivity extends Activity {
 
 		// Make an API call to our web service to get the events
 		// TODO: Make the fetchEvents call run in an AsyncTask seperate from the main UI
-		//       thread.
+		//       thread. Use AsyncTask.get() to wait until the thread completes.
 		try {
 			events = fetchEvents();
 		} catch (Exception e) {
