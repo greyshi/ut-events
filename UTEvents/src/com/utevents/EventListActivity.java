@@ -5,10 +5,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Xml;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -78,7 +81,7 @@ public class EventListActivity extends Activity {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		
 		conn.setRequestMethod("GET");
-		conn.setRequestProperty("Accept", "application/xml");
+		conn.setRequestProperty("Accept", "application/json");
 		
 		if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
 			response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -96,7 +99,18 @@ public class EventListActivity extends Activity {
 		events = new ArrayList<Event>();
 		// TODO: Unmarshall XML from responseString into Event objects and stuff
 		//       those objects into events. (SAX)
-		Xml.parse(responseString.toString(), null);
+		//Xml.parse(responseString.toString(), null);
+		JSONArray jsonEvents = new JSONArray(responseString.toString());
+		for (int i = 0; i < jsonEvents.length(); ++i) {
+			JSONObject event = jsonEvents.getJSONObject(i);
+			events.add(new Event(
+								event.getString("title"),
+								event.getString("location"),
+								new Date(event.getLong("startTime")),
+								new Date(event.getLong("endTime")),
+								event.getString("description")
+							));
+		}
 		
 		return events;
 	}
