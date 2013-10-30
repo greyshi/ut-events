@@ -38,8 +38,6 @@ public class EventListActivity extends Activity {
 		// Initially, a single TextView should display 'Fetching events...'
 
 		// Make an API call to our web service to get the events
-		// TODO: Make the fetchEvents call run in an AsyncTask seperate from the main UI
-		//       thread. Use AsyncTask.get() to wait until the thread completes.
 		try {
 			events = new FetchEventsTask().execute().get();
 		} catch (Exception e) {
@@ -107,12 +105,12 @@ public class EventListActivity extends Activity {
 		JSONArray jsonEvents = jsonResponse.getJSONArray("events");
 		for (int i = 0; i < jsonEvents.length(); ++i) {
 			JSONObject event = jsonEvents.getJSONObject(i);
+			// TODO: Handle optional fields (JSONException thrown if a JSONObject
+			//       can't find a value for a key.
 			events.add(new Event(
 								event.getString("title"),
 								event.getString("location"),
-								new Date(event.getLong("startTime")),
-								new Date(event.getLong("endTime")),
-								event.getString("description")
+								new Date(event.getLong("startTime"))
 							));
 		}
 		
