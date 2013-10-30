@@ -11,6 +11,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -40,7 +41,7 @@ public class EventListActivity extends Activity {
 		// TODO: Make the fetchEvents call run in an AsyncTask seperate from the main UI
 		//       thread. Use AsyncTask.get() to wait until the thread completes.
 		try {
-			events = fetchEvents();
+			events = new FetchEventsTask().execute().get();
 		} catch (Exception e) {
 			// TODO: Error handling
 		}
@@ -116,6 +117,19 @@ public class EventListActivity extends Activity {
 		}
 		
 		return events;
+	}
+	
+	private class FetchEventsTask extends AsyncTask<Void, Void, ArrayList<Event> > {
+	    /** The system calls this to perform work in a worker thread and
+	      * delivers it the parameters given to AsyncTask.execute() */
+	    protected ArrayList<Event> doInBackground(Void... voids) {
+	        try {
+	        	return fetchEvents();
+	        } catch (Exception e) {
+	        	// TODO: Error handling
+	        	return null;
+	        }
+	    }
 	}
 
 }
