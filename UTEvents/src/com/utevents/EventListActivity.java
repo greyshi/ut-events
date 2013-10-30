@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Xml;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -94,7 +95,8 @@ public class EventListActivity extends Activity {
 		
 		events = new ArrayList<Event>();
 		// TODO: Unmarshall XML from responseString into Event objects and stuff
-		//       those objects into events. (JAXB)
+		//       those objects into events. (SAX)
+		Xml.parse(responseString.toString(), null);
 		
 		return events;
 	}
