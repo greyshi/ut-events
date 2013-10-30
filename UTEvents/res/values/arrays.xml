@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <array name="test">
+        <item>test</item>
+        <item>test2</item>
+        <item>test</item>
+        <item>test2</item>
+        <item>test</item>
+        <item>test2</item>
+        <item>test</item>
+        <item>test2</item>
+        <item>test</item>
+        <item>test2</item>
+        <item>test</item>
+        <item>test2</item>
+    </array>
+
+</resources>
