@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<events>
+    <event>
+        <title>My Birthday</title>
+        <location>Everywhere</location>
+        <startTime>2014-04-28T00:00:00</startTime>
+    </event>
+    <event>
+        <title>My Event</title>
+        <location>Somewhere</location>
+        <startTime>2012-12-12T00:00:00</startTime>
+        <endTime>2012-12-12T23:59:59</endTime>
+        <description>It's the tweflth!</description>
+    </event>
+</events>
