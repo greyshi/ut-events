@@ -48,14 +48,11 @@ public class EventListActivity extends Activity {
 		// and specific formatting? width=fill_parent, add side padding, length=1 or
 		// whatever weight works to fix x events on a page) The parent View for the
 		// events should be scrollable (ListView).
-		
-		//listView.setAdapter(ArrayAdapter.createFromResource(this, R.array.test, R.layout.list_item));
-		eventsArray = events.toArray(new Event[events.size()]);
-		listView.setAdapter(new ArrayAdapter<Event>(this, R.layout.list_item, eventsArray));
-		
 		// NOTE: To use something other than TextViews for the array display, for instance, ImageViews, 
 		//       or to have some of data besides toString() results fill the views, override 
 		//       getView(int, View, ViewGroup) to return the type of view you want.
+		eventsArray = events.toArray(new Event[events.size()]);
+		listView.setAdapter(new ArrayAdapter<Event>(this, R.layout.list_item, eventsArray));
 		
 		// Replace the initial TextView with the new TextViews created from the
 		// data fetched from the database.
@@ -97,7 +94,7 @@ public class EventListActivity extends Activity {
 			return new ArrayList<Event>();
 		}
 		
-		// TODO: Support XML. Unmarshall XML from responseString into Event objects and
+		// TODO: Support XML. Unmarshal XML from responseString into Event objects and
 		//       stuff those objects into events. (SAX)
 		// 		 Xml.parse(responseString.toString(), null);
 		events = new ArrayList<Event>();
