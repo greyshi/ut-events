@@ -4,8 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -175,16 +176,16 @@ public class EventListActivity extends Activity {
 		//       stuff those objects into events. (SAX)
 		// 		 Xml.parse(responseString.toString(), null);
 		events = new ArrayList<Event>();
-		JSONObject jsonResponse = new JSONObject(responseString.toString());
-		JSONArray jsonEvents = jsonResponse.getJSONArray("events");
+		JSONArray jsonEvents = new JSONArray(responseString.toString());
 		for (int i = 0; i < jsonEvents.length(); ++i) {
 			JSONObject event = jsonEvents.getJSONObject(i);
+			JSONObject eventFields = event.getJSONObject("fields");
 			// TODO: Handle optional fields (JSONException thrown if a JSONObject
 			//       can't find a value for a key.
 			events.add(new Event(
-					event.getString("title"),
-					event.getString("location"),
-					new Date(event.getLong("startTime"))
+					eventFields.getString("title"),
+					eventFields.getString("location"),
+					new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).parse(eventFields.getString("start_time"))
 					));
 		}
 
