@@ -175,6 +175,7 @@ public class EventListActivity extends Activity {
 		// TODO: Support XML. Unmarshal XML from responseString into Event objects and
 		//       stuff those objects into events. (SAX)
 		// 		 Xml.parse(responseString.toString(), null);
+		
 		events = new ArrayList<Event>();
 		JSONArray jsonEvents = new JSONArray(responseString.toString());
 		for (int i = 0; i < jsonEvents.length(); ++i) {

@@ -7,10 +7,9 @@ public class Event {
 	private String title;
 	private String location;
 	private String description;
+	private String[] categories;
 	private Date startTime;
 	private Date endTime;
-	// TODO: Track categories
-	// private ArrayList<>
 	
 	Event (String title, String location, Date startTime) {
 		this.title = title;
