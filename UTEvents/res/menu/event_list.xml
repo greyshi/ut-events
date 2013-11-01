@@ -1,5 +1,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <item 
+        android:id ="@+id/refresh"
+        android:showAsAction="ifRoom"
+        android:title="@string/refresh"
+        android:icon="@drawable/ic_menu_refresh"/>
+    <item 
+        android:id ="@+id/search"
+        android:showAsAction="ifRoom"
+        android:title="@string/search"
+        android:icon="@drawable/ic_menu_search"/>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

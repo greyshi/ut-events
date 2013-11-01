@@ -120,14 +120,13 @@ public class EventListActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.event_list, menu);
 		return true;
 	}
 
-	
-	
-	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
 	    public void onItemClick(AdapterView parent, View view, int position, long id) {
