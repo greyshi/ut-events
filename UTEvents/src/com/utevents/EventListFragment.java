@@ -15,6 +15,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,29 +25,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class EventListFragment extends Fragment {
-	
-	private Event[] eventsArray;
-	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
 
-	
+	private ArrayList<Event> events = new ArrayList<Event>();
+	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
+	private View view;
+	private boolean mLoaded = false;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_event_list, container, false);
-		
-		
+		view = inflater.inflate(R.layout.fragment_event_list, container, false);
 
-		ArrayList<Event> events = new ArrayList<Event>();
+		ListView listView = (ListView) view.findViewById(R.id.content_list);
 
-		final TextView fetchingText = (TextView) view.findViewById(R.id.fetching_text);		
-		final ListView listView = (ListView) view.findViewById(R.id.content_list);
-
-		// Initially, a single TextView should display 'Fetching events...'
-
-		// Make an API call to our web service to get the events
 		try {
-			events = new FetchEventsTask().execute().get();
+			new FetchEventsTask().execute().get();
 		} catch (Exception e) {
-			// TODO: Error handling
+			//TODO
 		}
 
 		// Translate the events into view(s) (TextViews with background colors
@@ -56,21 +50,36 @@ public class EventListFragment extends Fragment {
 		// NOTE: To use something other than TextViews for the array display, for instance, ImageViews, 
 		//       or to have some of data besides toString() results fill the views, override 
 		//       getView(int, View, ViewGroup) to return the type of view you want.
-		eventsArray = events.toArray(new Event[events.size()]);
-		listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, eventsArray));
+		listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, events));
 		listView.setOnItemClickListener(new ListItemClickListener());
 
 		// Replace the initial TextView with the new TextViews created from the
 		// data fetched from the database.
-		fetchingText.setVisibility(View.GONE);
-		listView.setVisibility(View.VISIBLE); // Display list view
 
+
+		listView.setVisibility(View.VISIBLE);
 		return view;
 	}
-	
+
+	public void asyncFetch() {
+		// Make an API call to our web service to get the events
+		try {
+			mLoaded = false;
+			new FetchEventsTask().execute();
+		} catch (Exception e) {
+			// TODO: Error handling
+			Log.d("wut", e.toString());
+		}
+	}
+
 	// A helper method to make a call to our web API and return a list of events.
-		private ArrayList<Event> fetchEvents() throws Exception {
-			ArrayList<Event> events;
+	private void fetchEvents() throws Exception {
+		if(!mLoaded) {
+			TextView fetchingText = (TextView) view.findViewById(R.id.fetching_text);
+
+			fetchingText.setVisibility(View.VISIBLE);
+
+
 			BufferedReader response;
 			String responseLine;
 			StringBuilder responseString;
@@ -91,14 +100,14 @@ public class EventListFragment extends Fragment {
 
 				response.close();
 			} else {
-				return new ArrayList<Event>();
+				return;
 			}
 
 			// TODO: Support XML. Unmarshal XML from responseString into Event objects and
 			//       stuff those objects into events. (SAX)
 			// 		 Xml.parse(responseString.toString(), null);
-			
-			events = new ArrayList<Event>();
+
+			events.clear();
 			JSONArray jsonEvents = new JSONArray(responseString.toString());
 			for (int i = 0; i < jsonEvents.length(); ++i) {
 				JSONObject event = jsonEvents.getJSONObject(i);
@@ -112,44 +121,49 @@ public class EventListFragment extends Fragment {
 						));
 			}
 
-			return events;
+			mLoaded = true;
+			fetchingText.setVisibility(View.GONE);
 		}
+		// // Display list view
 
-		private class FetchEventsTask extends AsyncTask<Void, Void, ArrayList<Event> > {
-			/** The system calls this to perform work in a worker thread and
-			 * delivers it the parameters given to AsyncTask.execute() */
-			protected ArrayList<Event> doInBackground(Void... voids) {
-				try {
-					return fetchEvents();
-				} catch (Exception e) {
-					// TODO: Error handling
-					return new ArrayList<Event>();
-				}
+	}
+
+	private class FetchEventsTask extends AsyncTask<Void, Void, Integer> {
+		/** The system calls this to perform work in a worker thread and
+		 * delivers it the parameters given to AsyncTask.execute() */
+		protected Integer doInBackground(Void... voids) {
+			try {
+				fetchEvents();
+			} catch (Exception e) {
+				// TODO: Error handling
+				Log.d("wut", e.toString());
 			}
+			return 1;
 		}
-		
+	}
 
 
-		private class ListItemClickListener implements ListView.OnItemClickListener {
-		    @Override
-		    public void onItemClick(AdapterView parent, View view, int position, long id) {
-		        selectEvent(position);
-		    }
-		}
-		
-		/** Swaps fragments in the main content view */
-		private void selectEvent(int position) {
-		    // Create a new fragment and specify the planet to show based on position
-		    Fragment fragment = new EventDetailsFragment();
-		    Bundle args = new Bundle();
-		    args.putSerializable("current_event", eventsArray[position]);
-		    fragment.setArguments(args);
 
-		    // Insert the fragment by replacing any existing fragment
-		    FragmentManager fragmentManager = getFragmentManager();
-		    fragmentManager.beginTransaction()
-		                   .replace(R.id.content_frame, fragment)
-		                   .addToBackStack(null)
-		                   .commit();
+	private class ListItemClickListener implements ListView.OnItemClickListener {
+		@Override
+		public void onItemClick(AdapterView parent, View view, int position, long id) {
+			selectEvent(position);
 		}
+	}
+
+	/** Swaps fragments in the main content view */
+	private void selectEvent(int position) {
+		// Create a new fragment and specify the planet to show based on position
+		Fragment fragment = new EventDetailsFragment();
+		Bundle args = new Bundle();
+		args.putSerializable("current_event", events.get(position));
+		fragment.setArguments(args);
+
+		// Insert the fragment by replacing any existing fragment
+		FragmentManager fragmentManager = getFragmentManager();
+		fragmentManager.beginTransaction()
+		.replace(R.id.content_frame, fragment)
+		.addToBackStack(null)
+		.commit();
+	}
 }

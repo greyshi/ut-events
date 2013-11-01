@@ -77,7 +77,7 @@ public class EventListActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
 		
-	    Fragment fragment = new EventListFragment();
+	    EventListFragment fragment = new EventListFragment();
 
 	    // Insert the fragment by replacing any existing fragment
 	    FragmentManager fragmentManager = getFragmentManager();
