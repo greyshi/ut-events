@@ -1,8 +1,9 @@
 package com.utevents;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Event {
+public class Event implements Serializable {
 
 	private String title;
 	private String location;
@@ -77,7 +78,7 @@ public class Event {
 	
 	public String toString() {
 		// TODO: Implement
-		return "TODO";
+		return title + " @ " + location;
 	}
 	
 }

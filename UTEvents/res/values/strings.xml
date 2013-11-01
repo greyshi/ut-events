@@ -7,5 +7,6 @@
     <string name="fetching_events">Fetching Events…</string>
     <string name="drawer_open">Open Drawer</string>
     <string name="drawer_close">Close Drawer</string>
+    <string name="event_details">Event Details</string>
 
 </resources>
