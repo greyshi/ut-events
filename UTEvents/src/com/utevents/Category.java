@@ -1,7 +1,6 @@
 package com.utevents;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Category implements Serializable {
 

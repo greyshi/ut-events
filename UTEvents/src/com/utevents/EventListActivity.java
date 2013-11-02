@@ -1,21 +1,8 @@
 package com.utevents;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.res.Configuration;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.widget.DrawerLayout;
@@ -23,9 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class EventListActivity extends Activity {
 
@@ -108,6 +93,19 @@ public class EventListActivity extends Activity {
 			return true;
 		}
 		// Handle your other action bar items...
+		switch (item.getItemId()) {
+			case R.id.refresh:
+				EventListFragment fragment = new EventListFragment();
+				FragmentManager fragmentManager = getFragmentManager();
+			    fragmentManager.beginTransaction()
+			                   .replace(R.id.content_frame, fragment)
+			                   .commit();
+				break;
+			case R.id.search:
+				break;
+			default:
+		}
+			
 
 		return super.onOptionsItemSelected(item);
 	}
