@@ -11,6 +11,8 @@ import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.AsyncTask;
@@ -30,34 +32,23 @@ public class EventListFragment extends Fragment {
 	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
 	private View view;
 	private boolean mLoaded = false;
+	private static final Integer OK_LOADED = 1;
+	private ListView listView;
+	private TextView fetchingText;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		view = inflater.inflate(R.layout.fragment_event_list, container, false);
 
-		ListView listView = (ListView) view.findViewById(R.id.content_list);
+		listView = (ListView) view.findViewById(R.id.content_list);
+		fetchingText = (TextView) view.findViewById(R.id.fetching_text);
 
-		try {
-			new FetchEventsTask().execute().get();
-		} catch (Exception e) {
-			//TODO
+		if(!mLoaded) {
+			asyncFetch();
+		} else {
+			listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, events));
+			listView.setOnItemClickListener(new ListItemClickListener());
 		}
-
-		// Translate the events into view(s) (TextViews with background colors
-		// and specific formatting? width=fill_parent, add side padding, length=1 or
-		// whatever weight works to fix x events on a page) The parent View for the
-		// events should be scrollable (ListView).
-		// NOTE: To use something other than TextViews for the array display, for instance, ImageViews, 
-		//       or to have some of data besides toString() results fill the views, override 
-		//       getView(int, View, ViewGroup) to return the type of view you want.
-		listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, events));
-		listView.setOnItemClickListener(new ListItemClickListener());
-
-		// Replace the initial TextView with the new TextViews created from the
-		// data fetched from the database.
-
-
-		listView.setVisibility(View.VISIBLE);
 		return view;
 	}
 
@@ -65,7 +56,9 @@ public class EventListFragment extends Fragment {
 		// Make an API call to our web service to get the events
 		try {
 			mLoaded = false;
-			new FetchEventsTask().execute();
+			listView.setVisibility(View.GONE);
+			fetchingText.setVisibility(View.VISIBLE);
+			new FetchEventsTask(listView, fetchingText).execute();
 		} catch (Exception e) {
 			// TODO: Error handling
 			Log.d("wut", e.toString());
@@ -73,12 +66,8 @@ public class EventListFragment extends Fragment {
 	}
 
 	// A helper method to make a call to our web API and return a list of events.
-	private void fetchEvents() throws Exception {
+	private int fetchEvents() throws Exception {
 		if(!mLoaded) {
-			TextView fetchingText = (TextView) view.findViewById(R.id.fetching_text);
-
-			fetchingText.setVisibility(View.VISIBLE);
-
 
 			BufferedReader response;
 			String responseLine;
@@ -100,7 +89,7 @@ public class EventListFragment extends Fragment {
 
 				response.close();
 			} else {
-				return;
+				return 0;
 			}
 
 			// TODO: Support XML. Unmarshal XML from responseString into Event objects and
@@ -117,28 +106,72 @@ public class EventListFragment extends Fragment {
 				events.add(new Event(
 						eventFields.getString("title"),
 						eventFields.getString("location"),
-						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).parse(eventFields.getString("start_time"))
+						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("start_time"))
 						));
 			}
 
 			mLoaded = true;
-			fetchingText.setVisibility(View.GONE);
+			return OK_LOADED;
 		}
-		// // Display list view
+
+		return 0;
 
 	}
 
 	private class FetchEventsTask extends AsyncTask<Void, Void, Integer> {
 		/** The system calls this to perform work in a worker thread and
 		 * delivers it the parameters given to AsyncTask.execute() */
+
+		private ListView mListView;
+		private TextView mLoading;
+
+		FetchEventsTask(ListView listView, TextView fetchingText) {
+			mListView = listView;
+			mLoading = fetchingText;
+		}
+
 		protected Integer doInBackground(Void... voids) {
 			try {
-				fetchEvents();
+				return fetchEvents();
 			} catch (Exception e) {
 				// TODO: Error handling
 				Log.d("wut", e.toString());
 			}
-			return 1;
+			return 0;
+		}
+
+		@Override
+		protected void onPostExecute(Integer result) {
+			if(result == OK_LOADED) {
+				// Translate the events into view(s) (TextViews with background colors
+				// and specific formatting? width=fill_parent, add side padding, length=1 or
+				// whatever weight works to fix x events on a page) The parent View for the
+				// events should be scrollable (ListView).
+				// NOTE: To use something other than TextViews for the array display, for instance, ImageViews, 
+				//       or to have some of data besides toString() results fill the views, override 
+				//       getView(int, View, ViewGroup) to return the type of view you want.
+				mListView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, events));
+				mListView.setOnItemClickListener(new ListItemClickListener());
+
+				mListView.setAlpha(0f);
+				mListView.setVisibility(View.VISIBLE);
+
+				mListView.animate()
+				.alpha(1f)
+				.setDuration(500)
+				.setListener(null);
+
+				mLoading.animate()
+				.alpha(0f)
+				.setDuration(500)
+				.setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						mLoading.setVisibility(View.GONE);
+					}
+				});
+
+			}
 		}
 	}
 
