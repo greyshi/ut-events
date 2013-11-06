@@ -29,19 +29,21 @@ public class EventListActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ListView mDrawerList;
+	private CharSequence mDefaultTitle;
 	private CharSequence mTitle;
 	private CharSequence mDrawerTitle;
 	private MenuItem mRefreshButton;
 	private final static String CATEGORIES_URI = "http://utevents.herokuapp.com/categories";
 	private ArrayList<Integer> mCategoryIds = new ArrayList<Integer>();
 	private HashMap<Integer, Category> mCategories = new HashMap<Integer, Category>();
+	private EventListFragment mEventList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_list);
 
-		mTitle = getTitle();
+		mTitle = mDefaultTitle = getTitle();
 		mDrawerTitle = "Categories";
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerToggle = new ActionBarDrawerToggle(
@@ -71,12 +73,12 @@ public class EventListActivity extends Activity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
 		
-	    EventListFragment fragment = new EventListFragment();
+	    mEventList = new EventListFragment();
 
 	    // Insert the fragment by replacing any existing fragment
 	    FragmentManager fragmentManager = getFragmentManager();
 	    fragmentManager.beginTransaction()
-	                   .replace(R.id.content_frame, fragment)
+	                   .replace(R.id.content_frame, mEventList)
 	                   .commit();
 	    
 	    new FetchCategoriesTask(mDrawerList).execute();
@@ -110,11 +112,7 @@ public class EventListActivity extends Activity {
 				onBackPressed();
 				return true;    
 			case R.id.refresh:
-				EventListFragment fragment = new EventListFragment();
-				FragmentManager fragmentManager = getFragmentManager();
-			    fragmentManager.beginTransaction()
-			                   .replace(R.id.content_frame, fragment)
-			                   .commit();
+				mEventList.asyncFetch();
 				break;
 			case R.id.search:
 				break;
@@ -161,7 +159,14 @@ public class EventListActivity extends Activity {
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
 	    public void onItemClick(AdapterView parent, View view, int position, long id) {
-//	        selectItem(position);
+	        Category cat = mCategories.get(mCategoryIds.get(position));
+	        if(cat.getId() == EventListFragment.CATEGORIES_ALL) {
+	        	setTitle(mDefaultTitle);
+	        } else {
+	        	setTitle(cat.getTitle());
+	        }
+	        mEventList.setCategoryFilter(cat.getId());
+	        mDrawerLayout.closeDrawers();
 	    }
 	}
 	
@@ -194,6 +199,8 @@ public class EventListActivity extends Activity {
 			// 		 Xml.parse(responseString.toString(), null);
 
 			mCategoryIds.clear();
+			mCategoryIds.add(EventListFragment.CATEGORIES_ALL);
+			mCategories.put(EventListFragment.CATEGORIES_ALL, new Category(EventListFragment.CATEGORIES_ALL, "All", ""));
 			JSONArray jsonEvents = new JSONArray(responseString.toString());
 			for (int i = 0; i < jsonEvents.length(); ++i) {
 				JSONObject category = jsonEvents.getJSONObject(i);

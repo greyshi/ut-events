@@ -1,6 +1,7 @@
 package com.utevents;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Event implements Serializable {
@@ -8,25 +9,28 @@ public class Event implements Serializable {
 	private String title;
 	private String location;
 	private String description;
-	private String[] categories;
+	private ArrayList<Integer> categories;
 	private Date startTime;
 	private Date endTime;
 	
-	Event (String title, String location, Date startTime) {
+	Event (String title, ArrayList<Integer> categories, String location, Date startTime) {
 		this.title = title;
+		this.categories = categories;
 		this.location = location;
 		this.startTime = startTime;
 	}
 	
-	Event (String title, String location, Date startTime, Date endTime) {
+	Event (String title, ArrayList<Integer> categories, String location, Date startTime, Date endTime) {
 		this.title = title;
+		this.categories = categories;
 		this.location = location;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
 	
-	Event (String title, String location, Date startTime, Date endTime, String description) {
+	Event (String title, ArrayList<Integer> categories, String location, Date startTime, Date endTime, String description) {
 		this.title = title;
+		this.categories = categories;
 		this.location = location;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -74,6 +78,10 @@ public class Event implements Serializable {
 	
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
+	}
+	
+	public boolean inCategory(int category) {
+		return categories.contains(category);
 	}
 	
 	public String toString() {

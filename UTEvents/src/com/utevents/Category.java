@@ -37,6 +37,10 @@ public class Category implements Serializable {
 		return color;
 	}
 	
+	public int getId() {
+		return id;
+	}
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}

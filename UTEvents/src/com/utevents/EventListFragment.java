@@ -30,12 +30,16 @@ import android.widget.TextView;
 public class EventListFragment extends Fragment {
 
 	private ArrayList<Event> events = new ArrayList<Event>();
+	private ArrayList<Event> filteredEvents = new ArrayList<Event>();
+	
 	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
 	private View view;
 	private boolean mLoaded = false;
 	private static final Integer OK_LOADED = 1;
 	private ListView listView;
 	private TextView fetchingText;
+	public static final Integer CATEGORIES_ALL = 0;
+	private int mCategory = CATEGORIES_ALL;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class EventListFragment extends Fragment {
 		if(!mLoaded) {
 			asyncFetch();
 		} else {
-			listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, events));
+			listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, filteredEvents));
 			listView.setOnItemClickListener(new ListItemClickListener());
 		}
 		return view;
@@ -102,10 +106,17 @@ public class EventListFragment extends Fragment {
 			for (int i = 0; i < jsonEvents.length(); ++i) {
 				JSONObject event = jsonEvents.getJSONObject(i);
 				JSONObject eventFields = event.getJSONObject("fields");
+				JSONArray catArray = eventFields.getJSONArray("categories");
+				ArrayList<Integer> categories = new ArrayList<Integer>();
+				for(int k = 0;  k < catArray.length(); k++) {
+					categories.add(catArray.getJSONObject(k).getInt("pk"));
+				}
+				
 				// TODO: Handle optional fields (JSONException thrown if a JSONObject
 				//       can't find a value for a key.
 				events.add(new Event(
 						eventFields.getString("title"),
+						categories,
 						eventFields.getString("location"),
 						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("start_time"))
 						));
@@ -151,7 +162,8 @@ public class EventListFragment extends Fragment {
 				// NOTE: To use something other than TextViews for the array display, for instance, ImageViews, 
 				//       or to have some of data besides toString() results fill the views, override 
 				//       getView(int, View, ViewGroup) to return the type of view you want.
-				mListView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, events));
+				filterEvents();
+				mListView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, filteredEvents));
 				mListView.setOnItemClickListener(new ListItemClickListener());
 
 				mListView.setAlpha(0f);
@@ -190,7 +202,7 @@ public class EventListFragment extends Fragment {
 		// Create a new fragment and specify the planet to show based on position
 		Fragment fragment = new EventDetailsFragment();
 		Bundle args = new Bundle();
-		args.putSerializable("current_event", events.get(position));
+		args.putSerializable("current_event", filteredEvents.get(position));
 		fragment.setArguments(args);
 
 		// Insert the fragment by replacing any existing fragment
@@ -213,5 +225,25 @@ public class EventListFragment extends Fragment {
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void setCategoryFilter(int category) {
+		mCategory = category;
+		filterEvents();
+		listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, filteredEvents));
+		listView.setOnItemClickListener(new ListItemClickListener());
+	}
+	
+	private void filterEvents() {
+		if(mCategory == CATEGORIES_ALL) {
+			filteredEvents = new ArrayList<Event>(events);
+		} else {
+			filteredEvents.clear();
+			for(Event e : events) {
+				if(e.inCategory(mCategory)) {
+					filteredEvents.add(e);
+				}
+			}
+		}
 	}
 }
