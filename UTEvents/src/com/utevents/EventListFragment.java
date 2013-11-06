@@ -23,7 +23,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -40,6 +39,7 @@ public class EventListFragment extends Fragment {
 	private TextView fetchingText;
 	public static final Integer CATEGORIES_ALL = 0;
 	private int mCategory = CATEGORIES_ALL;
+	private EventListActivity mParent;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,11 +47,12 @@ public class EventListFragment extends Fragment {
 
 		listView = (ListView) view.findViewById(R.id.content_list);
 		fetchingText = (TextView) view.findViewById(R.id.fetching_text);
+		mParent = ((EventListActivity)getActivity());
 
 		if(!mLoaded) {
 			asyncFetch();
 		} else {
-			listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, filteredEvents));
+			listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
 			listView.setOnItemClickListener(new ListItemClickListener());
 		}
 		return view;
@@ -117,6 +118,7 @@ public class EventListFragment extends Fragment {
 				events.add(new Event(
 						eventFields.getString("title"),
 						categories,
+						mParent.getCategoryColor(categories.get(0)),
 						eventFields.getString("location"),
 						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("start_time"))
 						));
@@ -163,7 +165,7 @@ public class EventListFragment extends Fragment {
 				//       or to have some of data besides toString() results fill the views, override 
 				//       getView(int, View, ViewGroup) to return the type of view you want.
 				filterEvents();
-				mListView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, filteredEvents));
+				mListView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
 				mListView.setOnItemClickListener(new ListItemClickListener());
 
 				mListView.setAlpha(0f);
@@ -212,7 +214,7 @@ public class EventListFragment extends Fragment {
 		.addToBackStack(null)
 		.commit();
 		
-		((EventListActivity)getActivity()).setHomeStatus(false);
+		mParent.setHomeStatus(false);
 	}
 
 	@Override
@@ -230,7 +232,7 @@ public class EventListFragment extends Fragment {
 	public void setCategoryFilter(int category) {
 		mCategory = category;
 		filterEvents();
-		listView.setAdapter(new ArrayAdapter<Event>(view.getContext(), R.layout.list_item, filteredEvents));
+		listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
 		listView.setOnItemClickListener(new ListItemClickListener());
 	}
 	

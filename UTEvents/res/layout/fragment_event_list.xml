@@ -16,6 +16,13 @@
         android:id="@+id/content_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="start" />
+        android:layout_gravity="start"
+        android:dividerHeight="10dp" 
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:paddingBottom="10dp"
+	    android:paddingLeft="10dp"
+	    android:paddingRight="10dp"
+	    android:paddingTop="10dp" />
 
 </FrameLayout>

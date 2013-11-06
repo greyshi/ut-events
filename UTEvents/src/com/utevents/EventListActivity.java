@@ -262,4 +262,7 @@ public class EventListActivity extends Activity {
 		}
 	}
 
+	public int getCategoryColor(int category) {
+		return mCategories.get(category).getColor();
+	}
 }
