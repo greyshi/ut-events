@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -158,12 +159,12 @@ public class EventListFragment extends Fragment {
 
 				mListView.animate()
 				.alpha(1f)
-				.setDuration(500)
+				.setDuration(300)
 				.setListener(null);
 
 				mLoading.animate()
 				.alpha(0f)
-				.setDuration(500)
+				.setDuration(300)
 				.setListener(new AnimatorListenerAdapter() {
 					@Override
 					public void onAnimationEnd(Animator animation) {
@@ -198,5 +199,19 @@ public class EventListFragment extends Fragment {
 		.replace(R.id.content_frame, fragment)
 		.addToBackStack(null)
 		.commit();
+		
+		((EventListActivity)getActivity()).setHomeStatus(false);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			getFragmentManager().popBackStack();
+			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
+			return true;    
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 }

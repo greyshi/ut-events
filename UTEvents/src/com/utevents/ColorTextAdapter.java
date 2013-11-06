@@ -1,5 +1,7 @@
 package com.utevents;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +13,12 @@ public class ColorTextAdapter extends ArrayAdapter<String> {
 
     private LayoutInflater mInflater;
     
-    private String[] mStrings;
+    private ArrayList<String> mStrings;
     
     private int mViewResourceId;
     
     public ColorTextAdapter(Context ctx, int viewResourceId, int textResourceId,
-            String[] strings) {
+            ArrayList<String> strings) {
         super(ctx, viewResourceId, textResourceId, strings);
         
         mInflater = (LayoutInflater)ctx.getSystemService(
@@ -29,12 +31,12 @@ public class ColorTextAdapter extends ArrayAdapter<String> {
 
     @Override
     public int getCount() {
-        return mStrings.length;
+        return mStrings.size();
     }
 
     @Override
     public String getItem(int position) {
-        return mStrings[position];
+        return mStrings.get(position);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class ColorTextAdapter extends ArrayAdapter<String> {
         iv.setBackgroundColor( 0xFF000000 | rand256() << 16 | rand256() << 8 | rand256() );
         
         TextView tv = (TextView)convertView.findViewById(R.id.option_text);
-        tv.setText(mStrings[position]);
+        tv.setText(getItem(position));
         
         return convertView;
     }
