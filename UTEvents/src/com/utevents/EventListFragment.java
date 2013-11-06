@@ -52,7 +52,7 @@ public class EventListFragment extends Fragment {
 		}
 		return view;
 	}
-
+	
 	public void asyncFetch() {
 		// Make an API call to our web service to get the events
 		try {
