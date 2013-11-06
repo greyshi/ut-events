@@ -13,12 +13,6 @@ import android.widget.TextView;
 public class EventDetailsFragment extends Fragment {
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
-		super.onCreate(savedInstanceState);
-	}
-	
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.activity_event_details, container, false);
 		TextView titleView = (TextView)view.findViewById(R.id.event_title);
@@ -39,18 +33,5 @@ public class EventDetailsFragment extends Fragment {
 			descView.setText("Description: " + event.getDescription());
 		// TODO: catView.setText(event.getCategories().toString());
 		return view;
-	}
-	
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		MenuItem refresh = menu.findItem(R.id.refresh);
-		MenuItem search = menu.findItem(R.id.search);
-		
-		refresh.setEnabled(false);
-		refresh.setVisible(false);
-		search.setEnabled(false);
-		search.setVisible(false);
-		
-		super.onCreateOptionsMenu(menu, inflater);
 	}
 }

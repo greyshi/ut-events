@@ -4,15 +4,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.content.res.Configuration;
@@ -25,9 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class EventListActivity extends Activity {
 
@@ -38,7 +33,8 @@ public class EventListActivity extends Activity {
 	private CharSequence mDrawerTitle;
 	private MenuItem mRefreshButton;
 	private final static String CATEGORIES_URI = "http://utevents.herokuapp.com/categories";
-	private ArrayList<String> categories = new ArrayList<String>();
+	private ArrayList<Integer> mCategoryIds = new ArrayList<Integer>();
+	private HashMap<Integer, Category> mCategories = new HashMap<Integer, Category>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +144,11 @@ public class EventListActivity extends Activity {
 	public void setHomeStatus(boolean home) {
 		mRefreshButton.setVisible(home);
 		mDrawerToggle.setDrawerIndicatorEnabled(home);
+		if(!home) {
+			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+		} else {
+			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+		}
 	}
 
 	@Override
@@ -192,14 +193,16 @@ public class EventListActivity extends Activity {
 			//       stuff those objects into events. (SAX)
 			// 		 Xml.parse(responseString.toString(), null);
 
-			categories.clear();
+			mCategoryIds.clear();
 			JSONArray jsonEvents = new JSONArray(responseString.toString());
 			for (int i = 0; i < jsonEvents.length(); ++i) {
-				JSONObject event = jsonEvents.getJSONObject(i);
-				JSONObject eventFields = event.getJSONObject("fields");
+				JSONObject category = jsonEvents.getJSONObject(i);
+				JSONObject categoryFields = category.getJSONObject("fields");
+				int cid = category.getInt("pk");
 				// TODO: Handle optional fields (JSONException thrown if a JSONObject
 				//       can't find a value for a key.
-				categories.add(eventFields.getString("title"));
+				mCategoryIds.add(cid);
+				mCategories.put(cid, new Category(cid, categoryFields.getString("title"), categoryFields.getString("color")));
 			}
 
 			return 1;
@@ -237,7 +240,7 @@ public class EventListActivity extends Activity {
 				//       or to have some of data besides toString() results fill the views, override 
 				//       getView(int, View, ViewGroup) to return the type of view you want.
 				mListView.setAdapter(new ColorTextAdapter(EventListActivity.this,
-	                R.layout.drawer_list_item, R.id.option_text, categories));
+	                R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
 				mListView.setOnItemClickListener(new DrawerItemClickListener());
 
 				mListView.setAlpha(0f);

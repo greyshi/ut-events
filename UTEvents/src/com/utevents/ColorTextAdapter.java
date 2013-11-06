@@ -1,6 +1,7 @@
 package com.utevents;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,34 +10,37 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ColorTextAdapter extends ArrayAdapter<String> {
+public class ColorTextAdapter extends ArrayAdapter<Integer> {
 
     private LayoutInflater mInflater;
     
-    private ArrayList<String> mStrings;
+    private ArrayList<Integer> mIds;
+    
+    private HashMap<Integer, Category> mCategories;
     
     private int mViewResourceId;
     
     public ColorTextAdapter(Context ctx, int viewResourceId, int textResourceId,
-            ArrayList<String> strings) {
-        super(ctx, viewResourceId, textResourceId, strings);
+            ArrayList<Integer> ids, HashMap<Integer, Category> categories) {
+        super(ctx, viewResourceId, textResourceId, ids);
         
         mInflater = (LayoutInflater)ctx.getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
         
-        mStrings = strings;
+        mIds = ids;
+        mCategories = categories;
         
         mViewResourceId = viewResourceId;
     }
 
     @Override
     public int getCount() {
-        return mStrings.size();
+        return mIds.size();
     }
 
     @Override
-    public String getItem(int position) {
-        return mStrings.get(position);
+    public Integer getItem(int position) {
+        return mIds.get(position);
     }
 
     @Override
@@ -48,16 +52,14 @@ public class ColorTextAdapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent) {
         convertView = mInflater.inflate(mViewResourceId, null);
         
+        Category category = mCategories.get(getItem(position));
+        
         View iv = (View)convertView.findViewById(R.id.option_icon);
-        iv.setBackgroundColor( 0xFF000000 | rand256() << 16 | rand256() << 8 | rand256() );
+        iv.setBackgroundColor( category.getColor() );
         
         TextView tv = (TextView)convertView.findViewById(R.id.option_text);
-        tv.setText(getItem(position));
+        tv.setText( category.getTitle() );
         
         return convertView;
-    }
-    
-    public int rand256() {
-    	return (int) (Math.random()*256);
     }
 }
