@@ -19,6 +19,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,6 +38,12 @@ public class EventListFragment extends Fragment {
 	private static final Integer OK_LOADED = 1;
 	private ListView listView;
 	private TextView fetchingText;
+	
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
+		super.onCreate(savedInstanceState);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,6 +59,19 @@ public class EventListFragment extends Fragment {
 			listView.setOnItemClickListener(new ListItemClickListener());
 		}
 		return view;
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		MenuItem refresh = menu.findItem(R.id.refresh);
+		MenuItem search = menu.findItem(R.id.search);
+		
+		refresh.setEnabled(true);
+		refresh.setVisible(true);
+		search.setEnabled(true);
+		search.setVisible(true);
+		
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	public void asyncFetch() {
