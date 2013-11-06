@@ -14,23 +14,6 @@ public class Event implements Serializable {
 	private Date startTime;
 	private Date endTime;
 	
-	Event (String title, ArrayList<Integer> categories, int color, String location, Date startTime) {
-		this.title = title;
-		this.categories = categories;
-		this.color = color;
-		this.location = location;
-		this.startTime = startTime;
-	}
-	
-	Event (String title, ArrayList<Integer> categories, int color, String location, Date startTime, Date endTime) {
-		this.title = title;
-		this.categories = categories;
-		this.color = color;
-		this.location = location;
-		this.startTime = startTime;
-		this.endTime = endTime;
-	}
-	
 	Event (String title, ArrayList<Integer> categories, int color, String location, Date startTime, Date endTime, String description) {
 		this.title = title;
 		this.categories = categories;

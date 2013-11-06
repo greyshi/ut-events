@@ -27,10 +27,18 @@ public class EventDetailsFragment extends Fragment {
 		titleView.setText(event.getTitle());
 		locView.setText("Location: " + event.getLocation());
 		stView.setText("Start Time: " + event.getStartTime().toString());
-		if (event.getEndTime() != null)
+		if (event.getEndTime() != null) {
 			etView.setText("End Time: " + event.getEndTime().toString());
-		if (event.getDescription() != null)
+			etView.setVisibility(View.VISIBLE);
+		} else {
+			etView.setVisibility(View.GONE);
+		}
+		if (event.getDescription() != null && event.getDescription().length() > 0) {
 			descView.setText("Description: " + event.getDescription());
+			descView.setVisibility(View.VISIBLE);
+		} else {
+			descView.setVisibility(View.GONE);
+		}
 		// TODO: catView.setText(event.getCategories().toString());
 		return view;
 	}

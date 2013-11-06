@@ -6,12 +6,16 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 public class EventListActivity extends Activity {
 
@@ -37,7 +42,10 @@ public class EventListActivity extends Activity {
 	private ArrayList<Integer> mCategoryIds = new ArrayList<Integer>();
 	private HashMap<Integer, Category> mCategories = new HashMap<Integer, Category>();
 	private EventListFragment mEventList;
-
+	private int mNavCounter = 0;
+	private Stack<CharSequence> mTitles = new Stack<CharSequence>();
+	private SearchView mSearchView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -114,8 +122,6 @@ public class EventListActivity extends Activity {
 			case R.id.refresh:
 				mEventList.asyncFetch();
 				break;
-			case R.id.search:
-				break;
 			default:
 		}
 			
@@ -136,24 +142,65 @@ public class EventListActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.event_list, menu);
 		mRefreshButton = menu.findItem(R.id.refresh);
+		
+		// Associate searchable configuration with the SearchView
+	    SearchManager searchManager =
+	           (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	    mSearchView = (SearchView) menu.findItem(R.id.search).getActionView();
+	    mSearchView.setSearchableInfo(
+	            searchManager.getSearchableInfo(getComponentName()));
+
 		return true;
 	}
 	
-	public void setHomeStatus(boolean home) {
+	@Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search your data somehow
+			for(;mNavCounter > 0; mNavCounter--) {
+				getFragmentManager().popBackStack();
+				mTitles.pop();
+			}
+			mEventList.search(query);
+			mSearchView.onActionViewCollapsed();
+			mSearchView.setQuery("", false);
+        }
+    }
+	
+	private void setHomeStatus(boolean home) {
 		mRefreshButton.setVisible(home);
 		mDrawerToggle.setDrawerIndicatorEnabled(home);
 		if(!home) {
+			getActionBar().setTitle(mTitles.peek());
 			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		} else {
+			mEventList.setCategoryFilter(mEventList.getCategoryFilter());
+			getActionBar().setTitle(mTitle);
 			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 	}
-
+	
+	public void navigate(String title) {
+		mNavCounter++;
+		mTitles.push(title);
+		setHomeStatus(mNavCounter == 0);
+	}
+	
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
 		//turn on the Navigation Drawer image; this is called in the LowerLevelFragments
-		setHomeStatus(true);
+		if(mNavCounter > 0) {
+			mNavCounter--;
+			mTitles.pop();
+		}
+		setHomeStatus(mNavCounter == 0); 
 	}
 	
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {

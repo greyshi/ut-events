@@ -6,9 +6,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.animation.Animator;
@@ -30,7 +32,7 @@ public class EventListFragment extends Fragment {
 
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Event> filteredEvents = new ArrayList<Event>();
-	
+
 	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
 	private View view;
 	private boolean mLoaded = false;
@@ -40,6 +42,7 @@ public class EventListFragment extends Fragment {
 	public static final Integer CATEGORIES_ALL = 0;
 	private int mCategory = CATEGORIES_ALL;
 	private EventListActivity mParent;
+	private CharSequence mTitle = "UT Events";
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -57,7 +60,7 @@ public class EventListFragment extends Fragment {
 		}
 		return view;
 	}
-	
+
 	public void asyncFetch() {
 		// Make an API call to our web service to get the events
 		try {
@@ -112,7 +115,19 @@ public class EventListFragment extends Fragment {
 				for(int k = 0;  k < catArray.length(); k++) {
 					categories.add(catArray.getJSONObject(k).getInt("pk"));
 				}
-				
+
+				Date endDate = null;
+				String description = null;
+				try {
+					endDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("end_time"));
+				} catch (Exception e) {
+
+				}
+				try {
+					description = eventFields.getString("description");
+				} catch (JSONException e) {
+
+				}
 				// TODO: Handle optional fields (JSONException thrown if a JSONObject
 				//       can't find a value for a key.
 				events.add(new Event(
@@ -120,7 +135,9 @@ public class EventListFragment extends Fragment {
 						categories,
 						mParent.getCategoryColor(categories.get(0)),
 						eventFields.getString("location"),
-						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("start_time"))
+						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("start_time")),
+						endDate,
+						description
 						));
 			}
 
@@ -213,22 +230,28 @@ public class EventListFragment extends Fragment {
 		.replace(R.id.content_frame, fragment)
 		.addToBackStack(null)
 		.commit();
-		
-		mParent.setHomeStatus(false);
+
+		mParent.navigate("Details");
 	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			getFragmentManager().popBackStack();
-			getActivity().getActionBar().setDisplayHomeAsUpEnabled(false);
-			return true;    
+	public void search(String keyword) {
+		filteredEvents.clear();
+		String ciKey = keyword.toLowerCase();
+		for(Event e : events) {
+			if(e.getTitle().toLowerCase().contains(ciKey)) {
+				filteredEvents.add(e);
+			}
 		}
+		
+		getFragmentManager().beginTransaction()
+		.replace(R.id.content_frame, this)
+		.addToBackStack(null)
+		.commit();
 
-		return super.onOptionsItemSelected(item);
+		mParent.navigate("\"" + keyword + "\"");
+		listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
+		listView.setOnItemClickListener(new ListItemClickListener());
 	}
-	
 	public void setCategoryFilter(int category) {
 		mCategory = category;
 		filterEvents();
@@ -236,7 +259,11 @@ public class EventListFragment extends Fragment {
 		listView.setOnItemClickListener(new ListItemClickListener());
 	}
 	
-	private void filterEvents() {
+	public int getCategoryFilter() {
+		return mCategory;
+	}
+
+	public void filterEvents() {
 		if(mCategory == CATEGORIES_ALL) {
 			filteredEvents = new ArrayList<Event>(events);
 		} else {
