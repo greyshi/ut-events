@@ -1,8 +1,9 @@
 ut-events
 =========
 
-An android app for accessing events submitted by UT Austin students through a web form linked to by the Daily Texan newspaper
+An android app for accessing events submitted by UT Austin students
 
+There is also a [web interface](http://utevents.herokuapp.com) for UT Events. The repo for that is [ut-events-web](https://github.com/greyshi/ut-events-web).
 
 ###Primary Features
 * List upcoming events as cards sorted chronologically
