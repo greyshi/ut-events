@@ -64,8 +64,6 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
         tv = (TextView)convertView.findViewById(R.id.event_location);
         tv.setText( event.getLocation() );
         
-        
-        
         return convertView;
     }
     

@@ -25,9 +25,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.SearchView.OnCloseListener;
 
 public class EventListActivity extends Activity {
 
@@ -124,7 +126,6 @@ public class EventListActivity extends Activity {
 				break;
 			default:
 		}
-			
 
 		return super.onOptionsItemSelected(item);
 	}
@@ -149,6 +150,32 @@ public class EventListActivity extends Activity {
 	    mSearchView = (SearchView) menu.findItem(R.id.search).getActionView();
 	    mSearchView.setSearchableInfo(
 	            searchManager.getSearchableInfo(getComponentName()));
+	    mSearchView.setOnSearchClickListener(new OnClickListener() {
+	    	@Override
+	    	public void onClick(View v) {
+	    		View view;
+	    		
+	    		view = findViewById(R.id.refresh);
+	    		if (view != null) view.setVisibility(View.GONE);
+	    		
+	    		view = findViewById(R.id.add_event);
+	    		if (view != null) view.setVisibility(View.GONE);
+	    	}
+	    });
+	    mSearchView.setOnCloseListener(new OnCloseListener() {
+	    	@Override
+	    	public boolean onClose() {
+	    		View view;
+	    		
+	    		view = findViewById(R.id.refresh);
+	    		if (view != null) view.setVisibility(View.VISIBLE);
+	    		
+	    		view = findViewById(R.id.add_event);
+	    		if (view != null) view.setVisibility(View.VISIBLE);
+	    		
+	    		return false;
+	    	}
+	    });
 
 		return true;
 	}
@@ -159,7 +186,7 @@ public class EventListActivity extends Activity {
     }
 
     private void handleIntent(Intent intent) {
-
+    	
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             //use the query to search your data somehow
