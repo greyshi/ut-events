@@ -15,6 +15,7 @@
         android:id="@+id/add_event"
         android:icon="@drawable/ic_menu_new"
         android:showAsAction="collapseActionView|ifRoom"
-        android:title="@string/new_event"/>
+        android:title="@string/new_event"
+        android:enabled="false"/>
 
 </menu>
