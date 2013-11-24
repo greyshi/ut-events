@@ -86,8 +86,9 @@ public class EventListFragment extends Fragment {
 			BufferedReader response;
 			String responseLine;
 			StringBuilder responseString = null;
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 
-			URL url = new URL(EVENTS_URI);
+			URL url = new URL(EVENTS_URI + "?start_time__gte=" + dateFormat.format(new Date()));
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			
 			conn.setConnectTimeout(5000);
@@ -139,7 +140,7 @@ public class EventListFragment extends Fragment {
 				Date endDate = null;
 				String description = null;
 				try {
-					endDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(event.getString("end_time"));
+					endDate = dateFormat.parse(event.getString("end_time"));
 				} catch (Exception e) {
 
 				}
@@ -155,7 +156,7 @@ public class EventListFragment extends Fragment {
 						categories,
 						mParent.getCategoryColor(categories.get(0)),
 						event.getString("location"),
-						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(event.getString("start_time")),
+						dateFormat.parse(event.getString("start_time")),
 						endDate,
 						description
 						));
