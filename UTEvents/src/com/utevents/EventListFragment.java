@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +45,7 @@ public class EventListFragment extends Fragment {
 	private int mCategory = CATEGORIES_ALL;
 	private EventListActivity mParent;
 	private CharSequence mTitle = "UT Events";
+	private TextView failedText;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,11 +53,11 @@ public class EventListFragment extends Fragment {
 
 		listView = (ListView) view.findViewById(R.id.content_list);
 		fetchingText = (TextView) view.findViewById(R.id.fetching_text);
+		failedText = (TextView) view.findViewById(R.id.failed_text);
+		
 		mParent = ((EventListActivity)getActivity());
 
-		if(!mLoaded) {
-			asyncFetch();
-		} else {
+		if(mLoaded) {
 			listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
 			listView.setOnItemClickListener(new ListItemClickListener());
 		}
@@ -67,6 +69,8 @@ public class EventListFragment extends Fragment {
 		try {
 			mLoaded = false;
 			listView.setVisibility(View.GONE);
+			failedText.setVisibility(View.GONE);
+			fetchingText.setAlpha(1f);
 			fetchingText.setVisibility(View.VISIBLE);
 			new FetchEventsTask(listView, fetchingText).execute();
 		} catch (Exception e) {
@@ -110,7 +114,9 @@ public class EventListFragment extends Fragment {
 					break;
 				} catch (SocketTimeoutException ste) {
 					// Could not connect/read to/from server
-					if (i >= 0) return CONN_FAIL;
+					if (i >= 2) return CONN_FAIL;
+				} catch (UnknownHostException e) {
+					if (i >= 2) return CONN_FAIL;
 				}
 			}
 
@@ -181,8 +187,8 @@ public class EventListFragment extends Fragment {
 			} catch (Exception e) {
 				// TODO: Error handling
 				Log.d("wut", e.toString());
+				return CONN_FAIL;
 			}
-			return 0;
 		}
 
 		@Override
@@ -217,7 +223,23 @@ public class EventListFragment extends Fragment {
 					}
 				});
 			} else if (result == CONN_FAIL) {
-				fetchingText.setText("Could not connect to server...");
+				failedText.setAlpha(0f);
+				failedText.setVisibility(View.VISIBLE);
+				
+				failedText.animate()
+				.alpha(1f)
+				.setDuration(300)
+				.setListener(null);
+				
+				mLoading.animate()
+				.alpha(0f)
+				.setDuration(300)
+				.setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						mLoading.setVisibility(View.GONE);
+					}
+				});
 			}
 		}
 	}

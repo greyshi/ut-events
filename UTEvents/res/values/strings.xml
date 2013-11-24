@@ -12,5 +12,6 @@
     <string name="new_event">New Event</string>
     <string name="search">Search</string>
     <string name="search_hint">Search events</string>
+    <string name="fetch_failed">Could not connect to server…</string>
 
 </resources>

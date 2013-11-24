@@ -123,7 +123,7 @@ public class EventListActivity extends Activity {
 				onBackPressed();
 				return true;    
 			case R.id.refresh:
-				mEventList.asyncFetch();
+				new FetchCategoriesTask(mDrawerList).execute();
 				break;
 			default:
 		}
@@ -277,8 +277,8 @@ public class EventListActivity extends Activity {
 					break;
 				} catch (SocketTimeoutException ste) {
 					// Could not connect/read to/from server
-					if (i >= 0) return -1;
-				}
+					if (i >= 2) return -1;
+				} 
 			}
 
 			// TODO: Support XML. Unmarshal XML from responseString into Event objects and
@@ -318,8 +318,8 @@ public class EventListActivity extends Activity {
 			} catch (Exception e) {
 				// TODO: Error handling
 				Log.d("wut", e.toString());
+				return -1;
 			}
-			return 0;
 		}
 
 		@Override
@@ -343,9 +343,8 @@ public class EventListActivity extends Activity {
 				.alpha(1f)
 				.setDuration(300)
 				.setListener(null);
-			} else if (result == -1) {
-				((TextView) findViewById(R.id.fetching_text)).setText("Could not connect to server...");
 			}
+			mEventList.asyncFetch();
 		}
 	}
 
