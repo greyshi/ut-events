@@ -3,6 +3,7 @@ package com.utevents;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,6 +37,7 @@ public class EventListFragment extends Fragment {
 	private View view;
 	private boolean mLoaded = false;
 	private static final Integer OK_LOADED = 1;
+	private static final Integer CONN_FAIL = -1;
 	private ListView listView;
 	private TextView fetchingText;
 	public static final Integer CATEGORIES_ALL = 0;
@@ -80,28 +81,37 @@ public class EventListFragment extends Fragment {
 
 			BufferedReader response;
 			String responseLine;
-			StringBuilder responseString;
+			StringBuilder responseString = null;
 
 			URL url = new URL(EVENTS_URI);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			
-			//conn.setConnectTimeout(5000);
-			//conn.setReadTimeout(5000);
-
+			conn.setConnectTimeout(5000);
+			conn.setReadTimeout(5000);
+			
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
-
-			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-				responseString = new StringBuilder();
-				while ((responseLine = response.readLine()) != null) {
-					responseString.append(responseLine);
+			
+			for (byte i = 0; i < 3; ++i) {
+				try {
+					if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+						response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		
+						responseString = new StringBuilder();
+						while ((responseLine = response.readLine()) != null) {
+							responseString.append(responseLine);
+						}
+		
+						response.close();
+					} else {
+						return CONN_FAIL;
+					}
+					
+					break;
+				} catch (SocketTimeoutException ste) {
+					// Could not connect/read to/from server
+					if (i >= 0) return CONN_FAIL;
 				}
-
-				response.close();
-			} else {
-				return 0;
 			}
 
 			// TODO: Support XML. Unmarshal XML from responseString into Event objects and
@@ -206,7 +216,8 @@ public class EventListFragment extends Fragment {
 						mLoading.setVisibility(View.GONE);
 					}
 				});
-
+			} else if (result == CONN_FAIL) {
+				fetchingText.setText("Could not connect to server...");
 			}
 		}
 	}

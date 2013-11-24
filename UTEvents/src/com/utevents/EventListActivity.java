@@ -3,6 +3,7 @@ package com.utevents;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
+import android.widget.TextView;
 
 public class EventListActivity extends Activity {
 
@@ -92,7 +94,6 @@ public class EventListActivity extends Activity {
 	                   .commit();
 	    
 	    new FetchCategoriesTask(mDrawerList).execute();
-	    
 	}
 
 
@@ -247,25 +248,37 @@ public class EventListActivity extends Activity {
 	private int fetchCategories() throws Exception {
 			BufferedReader response;
 			String responseLine;
-			StringBuilder responseString;
+			StringBuilder responseString = null;
 
 			URL url = new URL(CATEGORIES_URI);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
+			conn.setConnectTimeout(5000);
+			conn.setReadTimeout(5000);
+			
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
 
-			if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-				responseString = new StringBuilder();
-				while ((responseLine = response.readLine()) != null) {
-					responseString.append(responseLine);
+			for (byte i = 0; i < 3; ++i) {
+				try {
+					if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+						response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		
+						responseString = new StringBuilder();
+						while ((responseLine = response.readLine()) != null) {
+							responseString.append(responseLine);
+						}
+		
+						response.close();
+					} else {
+						return -1;
+					}
+					
+					break;
+				} catch (SocketTimeoutException ste) {
+					// Could not connect/read to/from server
+					if (i >= 0) return -1;
 				}
-
-				response.close();
-			} else {
-				return 0;
 			}
 
 			// TODO: Support XML. Unmarshal XML from responseString into Event objects and
@@ -330,7 +343,8 @@ public class EventListActivity extends Activity {
 				.alpha(1f)
 				.setDuration(300)
 				.setListener(null);
-
+			} else if (result == -1) {
+				((TextView) findViewById(R.id.fetching_text)).setText("Could not connect to server...");
 			}
 		}
 	}
