@@ -49,6 +49,7 @@ public class EventListActivity extends Activity {
 	private int mNavCounter = 0;
 	private Stack<CharSequence> mTitles = new Stack<CharSequence>();
 	private SearchView mSearchView;
+	private FetchCategoriesTask fct;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +124,10 @@ public class EventListActivity extends Activity {
 				onBackPressed();
 				return true;    
 			case R.id.refresh:
-				new FetchCategoriesTask(mDrawerList).execute();
+				if (fct == null || fct.getStatus() != AsyncTask.Status.RUNNING) {
+					fct = new FetchCategoriesTask(mDrawerList);
+					fct.execute();
+				}
 				break;
 			default:
 		}
