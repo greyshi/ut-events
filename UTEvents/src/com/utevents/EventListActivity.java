@@ -342,9 +342,6 @@ public class EventListActivity extends Activity {
 				// and specific formatting? width=fill_parent, add side padding, length=1 or
 				// whatever weight works to fix x events on a page) The parent View for the
 				// events should be scrollable (ListView).
-				// NOTE: To use something other than TextViews for the array display, for instance, ImageViews, 
-				//       or to have some of data besides toString() results fill the views, override 
-				//       getView(int, View, ViewGroup) to return the type of view you want.
 				mListView.setAdapter(new ColorTextAdapter(EventListActivity.this,
 	                R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
 				mListView.setOnItemClickListener(new DrawerItemClickListener());
@@ -356,10 +353,11 @@ public class EventListActivity extends Activity {
 				.alpha(1f)
 				.setDuration(300)
 				.setListener(null);
-				mEventList.asyncFetch();
 			} else if (result == -1) {
 				// Update TextView to display connection failure
 			}
+			// Move this so it doesn't fetch events if fetching categories fails
+			mEventList.asyncFetch();
 		}
 	}
 
