@@ -40,7 +40,7 @@ public class EventListActivity extends Activity {
 	private CharSequence mTitle;
 	private CharSequence mDrawerTitle;
 	private MenuItem mRefreshButton;
-	private final static String CATEGORIES_URI = "http://utevents.herokuapp.com/categories";
+	private final static String CATEGORIES_URI = "http://utevents.herokuapp.com/api/v1/categories/";
 	private ArrayList<Integer> mCategoryIds = new ArrayList<Integer>();
 	private HashMap<Integer, Category> mCategories = new HashMap<Integer, Category>();
 	private EventListFragment mEventList;
@@ -275,19 +275,18 @@ public class EventListActivity extends Activity {
 			mCategoryIds.clear();
 			mCategoryIds.add(EventListFragment.CATEGORIES_ALL);
 			mCategories.put(EventListFragment.CATEGORIES_ALL, new Category(EventListFragment.CATEGORIES_ALL, "All", ""));
-			JSONArray jsonEvents = new JSONArray(responseString.toString());
-			for (int i = 0; i < jsonEvents.length(); ++i) {
-				JSONObject category = jsonEvents.getJSONObject(i);
-				JSONObject categoryFields = category.getJSONObject("fields");
-				int cid = category.getInt("pk");
+			JSONObject object = new JSONObject(responseString.toString());
+			JSONArray jsonCategories = object.getJSONArray("objects");
+			for (int i = 0; i < jsonCategories.length(); ++i) {
+				JSONObject category = jsonCategories.getJSONObject(i);
+				int cid = category.getInt("id");
 				// TODO: Handle optional fields (JSONException thrown if a JSONObject
 				//       can't find a value for a key.
 				mCategoryIds.add(cid);
-				mCategories.put(cid, new Category(cid, categoryFields.getString("title"), categoryFields.getString("color")));
+				mCategories.put(cid, new Category(cid, category.getString("title"), category.getString("color")));
 			}
 
 			return 1;
-
 	}
 
 	private class FetchCategoriesTask extends AsyncTask<Void, Void, Integer> {

@@ -33,7 +33,7 @@ public class EventListFragment extends Fragment {
 	private ArrayList<Event> events = new ArrayList<Event>();
 	private ArrayList<Event> filteredEvents = new ArrayList<Event>();
 
-	private final static String EVENTS_URI = "http://utevents.herokuapp.com/events";
+	private final static String EVENTS_URI = "http://utevents.herokuapp.com/api/v1/events/";
 	private View view;
 	private boolean mLoaded = false;
 	private static final Integer OK_LOADED = 1;
@@ -84,6 +84,9 @@ public class EventListFragment extends Fragment {
 
 			URL url = new URL(EVENTS_URI);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			
+			//conn.setConnectTimeout(5000);
+			//conn.setReadTimeout(5000);
 
 			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
@@ -106,36 +109,37 @@ public class EventListFragment extends Fragment {
 			// 		 Xml.parse(responseString.toString(), null);
 
 			events.clear();
-			JSONArray jsonEvents = new JSONArray(responseString.toString());
+			JSONObject objects = new JSONObject (responseString.toString());
+			JSONArray jsonEvents = objects.getJSONArray("objects");
 			for (int i = 0; i < jsonEvents.length(); ++i) {
 				JSONObject event = jsonEvents.getJSONObject(i);
-				JSONObject eventFields = event.getJSONObject("fields");
-				JSONArray catArray = eventFields.getJSONArray("categories");
+				JSONArray catArray = event.getJSONArray("categories");
 				ArrayList<Integer> categories = new ArrayList<Integer>();
 				for(int k = 0;  k < catArray.length(); k++) {
-					categories.add(catArray.getJSONObject(k).getInt("pk"));
+					String[] cat = catArray.getString(k).split("/");
+					categories.add(Integer.parseInt(cat[4]));
 				}
 
 				Date endDate = null;
 				String description = null;
 				try {
-					endDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("end_time"));
+					endDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(event.getString("end_time"));
 				} catch (Exception e) {
 
 				}
 				try {
-					description = eventFields.getString("description");
+					description = event.getString("description");
 				} catch (JSONException e) {
 
 				}
 				// TODO: Handle optional fields (JSONException thrown if a JSONObject
 				//       can't find a value for a key.
 				events.add(new Event(
-						eventFields.getString("title"),
+						event.getString("title"),
 						categories,
 						mParent.getCategoryColor(categories.get(0)),
-						eventFields.getString("location"),
-						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(eventFields.getString("start_time")),
+						event.getString("location"),
+						new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).parse(event.getString("start_time")),
 						endDate,
 						description
 						));
