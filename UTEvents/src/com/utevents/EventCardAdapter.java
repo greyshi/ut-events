@@ -1,7 +1,6 @@
 package com.utevents;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import android.content.Context;
 import android.view.LayoutInflater;

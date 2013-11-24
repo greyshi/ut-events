@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +32,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnCloseListener;
-import android.widget.TextView;
 
 public class EventListActivity extends Activity {
 
@@ -43,6 +43,7 @@ public class EventListActivity extends Activity {
 	private CharSequence mDrawerTitle;
 	private MenuItem mRefreshButton;
 	private final static String CATEGORIES_URI = "http://utevents.herokuapp.com/api/v1/categories/";
+	private final static String CREATE_URI = "http://utevents.herokuapp.com/create";
 	private ArrayList<Integer> mCategoryIds = new ArrayList<Integer>();
 	private HashMap<Integer, Category> mCategories = new HashMap<Integer, Category>();
 	private EventListFragment mEventList;
@@ -127,6 +128,14 @@ public class EventListActivity extends Activity {
 				if (fct == null || fct.getStatus() != AsyncTask.Status.RUNNING) {
 					fct = new FetchCategoriesTask(mDrawerList);
 					fct.execute();
+				}
+				break;
+			case R.id.add_event:
+				try {
+					Intent i = Intent.parseUri(CREATE_URI, 0);
+					startActivity(i);
+				} catch (URISyntaxException urise) {
+					// We should never reach this. Display error?
 				}
 				break;
 			default:
@@ -317,7 +326,7 @@ public class EventListActivity extends Activity {
 		}
 
 		protected Integer doInBackground(Void... voids) {
-			try {
+			try {				
 				return fetchCategories();
 			} catch (Exception e) {
 				// TODO: Error handling
@@ -347,8 +356,10 @@ public class EventListActivity extends Activity {
 				.alpha(1f)
 				.setDuration(300)
 				.setListener(null);
+				mEventList.asyncFetch();
+			} else if (result == -1) {
+				// Update TextView to display connection failure
 			}
-			mEventList.asyncFetch();
 		}
 	}
 
