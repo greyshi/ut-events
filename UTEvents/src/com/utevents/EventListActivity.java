@@ -42,6 +42,8 @@ public class EventListActivity extends Activity {
 	private CharSequence mTitle;
 	private CharSequence mDrawerTitle;
 	private MenuItem mRefreshButton;
+	private MenuItem mAddButton;
+	private MenuItem mSearchButton;
 	private final static String CATEGORIES_URI = "http://utevents.herokuapp.com/api/v1/categories/";
 	private final static String CREATE_URI = "http://utevents.herokuapp.com/create";
 	private ArrayList<Integer> mCategoryIds = new ArrayList<Integer>();
@@ -157,6 +159,8 @@ public class EventListActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.event_list, menu);
 		mRefreshButton = menu.findItem(R.id.refresh);
+		mAddButton = menu.findItem(R.id.add_event);
+		mSearchButton = menu.findItem(R.id.search);
 		
 		// Associate searchable configuration with the SearchView
 	    SearchManager searchManager =
@@ -216,6 +220,9 @@ public class EventListActivity extends Activity {
 	
 	private void setHomeStatus(boolean home) {
 		mRefreshButton.setVisible(home);
+		mAddButton.setVisible(home);
+		mSearchButton.setVisible(home);
+		
 		mDrawerToggle.setDrawerIndicatorEnabled(home);
 		if(!home) {
 			getActionBar().setTitle(mTitles.peek());
