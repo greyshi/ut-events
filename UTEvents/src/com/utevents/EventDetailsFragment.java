@@ -1,5 +1,7 @@
 package com.utevents;
 
+import java.util.HashMap;
+
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ public class EventDetailsFragment extends Fragment {
 		TextView catView = (TextView)view.findViewById(R.id.event_categories);
 		
 		Event event = (Event) getArguments().getSerializable("current_event");
+		HashMap<Integer, Category> categories = (HashMap<Integer, Category>) getArguments().getSerializable("categories");
 		
 		titleView.setText(event.getTitle());
 		locView.setText("Location: " + event.getLocation());
@@ -39,7 +42,11 @@ public class EventDetailsFragment extends Fragment {
 			view.findViewById(R.id.event_description_header).setVisibility(View.GONE);
 		}
 		if (event.getCategories() != null){
-			catView.setText(event.getCategories().toString());
+			StringBuilder sb = new StringBuilder();
+			for (Integer i : event.getCategories()) {
+				sb.append(categories.get(i) + "\n");
+			}
+			catView.setText(sb.toString());
 		} else {
 			catView.setVisibility(View.GONE);
 			view.findViewById(R.id.event_categories_header).setVisibility(View.GONE);

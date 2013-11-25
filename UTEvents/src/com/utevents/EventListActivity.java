@@ -371,4 +371,8 @@ public class EventListActivity extends Activity {
 	public int getCategoryColor(int category) {
 		return mCategories.get(category).getColor();
 	}
+	
+	public HashMap<Integer, Category> getAllCategories() {
+		return mCategories;
+	}
 }

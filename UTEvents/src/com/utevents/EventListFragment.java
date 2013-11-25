@@ -260,6 +260,7 @@ public class EventListFragment extends Fragment {
 		Fragment fragment = new EventDetailsFragment();
 		Bundle args = new Bundle();
 		args.putSerializable("current_event", filteredEvents.get(position));
+		args.putSerializable("categories", mParent.getAllCategories());
 		fragment.setArguments(args);
 
 		// Insert the fragment by replacing any existing fragment
