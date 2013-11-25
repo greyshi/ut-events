@@ -286,10 +286,11 @@ public class EventListFragment extends Fragment {
 		.addToBackStack(null)
 		.commit();
 
-		mParent.navigate("\"" + keyword + "\"");
+		mParent.navigate("Searched For: \"" + keyword + "\"");
 		listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
 		listView.setOnItemClickListener(new ListItemClickListener());
 	}
+	
 	public void setCategoryFilter(int category) {
 		mCategory = category;
 		filterEvents();
