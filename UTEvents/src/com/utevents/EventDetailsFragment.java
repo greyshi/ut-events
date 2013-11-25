@@ -29,14 +29,21 @@ public class EventDetailsFragment extends Fragment {
 			etView.setVisibility(View.VISIBLE);
 		} else {
 			etView.setVisibility(View.GONE);
+			view.findViewById(R.id.event_end_header).setVisibility(View.GONE);
 		}
 		if (event.getDescription() != null && event.getDescription().length() > 0) {
 			descView.setText("Description: " + event.getDescription());
 			descView.setVisibility(View.VISIBLE);
 		} else {
 			descView.setVisibility(View.GONE);
+			view.findViewById(R.id.event_description_header).setVisibility(View.GONE);
 		}
-		// TODO: catView.setText(event.getCategories().toString());
+		if (event.getCategories() != null){
+			catView.setText(event.getCategories().toString());
+		} else {
+			catView.setVisibility(View.GONE);
+			view.findViewById(R.id.event_categories_header).setVisibility(View.GONE);
+		}
 		return view;
 	}
 }

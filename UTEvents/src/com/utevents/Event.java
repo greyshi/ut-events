@@ -44,6 +44,10 @@ public class Event implements Serializable {
 		return endTime;
 	}
 	
+	public ArrayList<Integer> getCategories() {
+		return categories;
+	}
+	
 	public void setTitle(String title) {
 		this.title = title;
 	}

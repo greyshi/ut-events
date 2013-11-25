@@ -8,30 +8,104 @@
         android:id="@+id/event_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="Title"
+        android:textSize="22sp"
+        android:textStyle="bold" />
     <TextView
-        android:id="@+id/event_location"
+        android:id="@+id/event_location_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"/>
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Location"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+	<TextView
+	    android:id="@+id/event_location"
+	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:textSize="14sp" />
     <TextView
-        android:id="@+id/event_start"
+        android:id="@+id/event_start_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"/>
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Start"
+        android:textSize="18sp"
+        android:textStyle="bold" />
     <TextView
-        android:id="@+id/event_end"
+	    android:id="@+id/event_start"
+	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:textSize="14sp" />
+    <TextView
+        android:id="@+id/event_end_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"/>
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="End"
+        android:textSize="18sp"
+        android:textStyle="bold" />
     <TextView
-        android:id="@+id/event_description"
+	    android:id="@+id/event_end"
+	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:textSize="14sp" />
+    <TextView
+        android:id="@+id/event_description_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"/>
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Description"
+        android:textSize="18sp"
+        android:textStyle="bold" />
     <TextView
-        android:id="@+id/event_categories"
+	    android:id="@+id/event_description"
+	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:textSize="14sp" />
+    <TextView
+        android:id="@+id/event_categories_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"/>
+        android:layout_gravity="left"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Categories"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+    <TextView
+	    android:id="@+id/event_categories"
+	    android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="10dp"
+        android:textSize="14sp" />
 </LinearLayout>
