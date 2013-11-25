@@ -256,7 +256,7 @@ public class EventListFragment extends Fragment {
 
 	/** Swaps fragments in the main content view */
 	private void selectEvent(int position) {
-		// Create a new fragment and specify the planet to show based on position
+		// Create a new fragment
 		Fragment fragment = new EventDetailsFragment();
 		Bundle args = new Bundle();
 		args.putSerializable("current_event", filteredEvents.get(position));

@@ -24,9 +24,6 @@ public class Event implements Serializable {
 		this.description = description;
 	}
 	
-	// TODO: Fix constructors so that an Event can be created with either an endTime,
-	//       a description, neither, or both.
-	
 	public String getTitle() {
 		return title;
 	}
