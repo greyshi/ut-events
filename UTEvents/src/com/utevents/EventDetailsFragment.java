@@ -1,5 +1,6 @@
 package com.utevents;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import android.app.Fragment;
@@ -24,18 +25,20 @@ public class EventDetailsFragment extends Fragment {
 		Event event = (Event) getArguments().getSerializable("current_event");
 		HashMap<Integer, Category> categories = (HashMap<Integer, Category>) getArguments().getSerializable("categories");
 		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMMMMMMM dd, yyyy at hh:mma");
+		
 		titleView.setText(event.getTitle());
-		locView.setText("Location: " + event.getLocation());
-		stView.setText("Start Time: " + event.getStartTime().toString());
+		locView.setText(event.getLocation());
+		stView.setText(dateFormat.format(event.getStartTime()));
 		if (event.getEndTime() != null) {
-			etView.setText("End Time: " + event.getEndTime().toString());
+			etView.setText(dateFormat.format(event.getEndTime()));
 			etView.setVisibility(View.VISIBLE);
 		} else {
 			etView.setVisibility(View.GONE);
 			view.findViewById(R.id.event_end_header).setVisibility(View.GONE);
 		}
 		if (event.getDescription() != null && event.getDescription().length() > 0) {
-			descView.setText("Description: " + event.getDescription());
+			descView.setText(event.getDescription().trim());
 			descView.setVisibility(View.VISIBLE);
 		} else {
 			descView.setVisibility(View.GONE);
