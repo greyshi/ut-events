@@ -25,7 +25,7 @@ public class EventDetailsFragment extends Fragment {
 		Event event = (Event) getArguments().getSerializable("current_event");
 		HashMap<Integer, Category> categories = (HashMap<Integer, Category>) getArguments().getSerializable("categories");
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMMMMMMM dd, yyyy at hh:mma");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMMMMMMM dd, yyyy 'at' hh:mma");
 		
 		titleView.setText(event.getTitle());
 		locView.setText(event.getLocation());
