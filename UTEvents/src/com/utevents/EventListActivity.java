@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.Fragment.SavedState;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
@@ -54,14 +55,28 @@ public class EventListActivity extends Activity {
 	private SearchView mSearchView;
 	private FetchCategoriesTask fct;
 	private boolean categoriesLoaded = false;
+	private boolean isHome = true;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_event_list);
 
-		mTitle = mDefaultTitle = getTitle();
-		mDrawerTitle = "Categories";
+		if (savedInstanceState != null) {
+			mNavCounter = savedInstanceState.getInt("nav_counter");
+			categoriesLoaded = savedInstanceState.getBoolean("categories_loaded");
+			mDefaultTitle = savedInstanceState.getCharSequence("mDefaultTitle");
+			mTitle = savedInstanceState.getCharSequence("title");
+			mDrawerTitle = savedInstanceState.getCharSequence("drawer_title");
+			mTitles = (Stack<CharSequence>)savedInstanceState.getSerializable("titles");
+			mCategoryIds = (ArrayList<Integer>)savedInstanceState.getSerializable("category_ids");
+			mCategories = (HashMap<Integer, Category>)savedInstanceState.getSerializable("categories");
+			isHome = savedInstanceState.getBoolean("home");
+		} else {
+			mTitle = mDefaultTitle = getTitle();
+			mDrawerTitle = "Categories";
+		}
+		
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerToggle = new ActionBarDrawerToggle(
 				this,                  /* host Activity */
@@ -91,16 +106,38 @@ public class EventListActivity extends Activity {
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
-		
-	    mEventList = new EventListFragment();
-
-	    // Insert the fragment by replacing any existing fragment
-	    FragmentManager fragmentManager = getFragmentManager();
-	    fragmentManager.beginTransaction()
-	                   .replace(R.id.content_frame, mEventList)
-	                   .commit();
 	    
-	    new FetchCategoriesTask(mDrawerList).execute();
+		mEventList = new EventListFragment();
+		
+	    if (savedInstanceState != null) {
+	    	mEventList.setCategory(savedInstanceState.getInt("category"));
+	    	mEventList.setLoaded(savedInstanceState.getBoolean("loaded"));
+	    	mEventList.setFilteredEvents((ArrayList<Event>)savedInstanceState.getSerializable("filtered_events"));
+	    	mEventList.setEvents((ArrayList<Event>)savedInstanceState.getSerializable("events"));
+
+	    	getFragmentManager().beginTransaction()
+            				    .replace(R.id.content_frame, mEventList)
+            				    .commit();
+	    	
+	    	mDrawerList.setAdapter(new ColorTextAdapter(EventListActivity.this,
+	                R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
+	    	mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+	    	mDrawerList.setAlpha(0f);
+	    	mDrawerList.setVisibility(View.VISIBLE);
+
+	    	mDrawerList.animate()
+					   .alpha(1f)
+					   .setDuration(300)
+					   .setListener(null);
+	    	
+	    } else {
+	    	getFragmentManager().beginTransaction()
+		    					.replace(R.id.content_frame, mEventList)
+		    					.commit();
+	    	
+	    	new FetchCategoriesTask(mDrawerList).execute();
+	    }
 	}
 
 
@@ -117,6 +154,26 @@ public class EventListActivity extends Activity {
 		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		
+		outState.putInt("nav_counter", mNavCounter);
+		outState.putBoolean("categories_loaded", categoriesLoaded);
+		outState.putCharSequence("default_title", mDefaultTitle);
+		outState.putCharSequence("title", mTitle);
+		outState.putCharSequence("drawer_title", mDrawerTitle);
+		outState.putSerializable("titles", mTitles);
+		outState.putSerializable("category_ids", mCategoryIds);
+		outState.putSerializable("categories", mCategories);
+		outState.putBoolean("home", isHome);
+		
+		outState.putInt("category", mEventList.getCategory());
+		outState.putBoolean("loaded", mEventList.getLoaded());
+		outState.putSerializable("filtered_events", mEventList.getFilteredEvents());
+		outState.putSerializable("events", mEventList.getEvents());
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Pass the event to ActionBarDrawerToggle, if it returns
@@ -197,6 +254,8 @@ public class EventListActivity extends Activity {
 	    		return false;
 	    	}
 	    });
+	    
+	    setHomeStatus(isHome);
 
 		return true;
 	}
@@ -222,6 +281,8 @@ public class EventListActivity extends Activity {
     }
 	
 	private void setHomeStatus(boolean home) {
+		isHome = home;
+		
 		mRefreshButton.setVisible(home);
 		mAddButton.setVisible(home);
 		mSearchButton.setVisible(home);
