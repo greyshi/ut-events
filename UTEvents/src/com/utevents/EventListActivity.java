@@ -53,6 +53,7 @@ public class EventListActivity extends Activity {
 	private Stack<CharSequence> mTitles = new Stack<CharSequence>();
 	private SearchView mSearchView;
 	private FetchCategoriesTask fct;
+	private boolean categoriesLoaded = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,8 @@ public class EventListActivity extends Activity {
 
 		// Set the drawer toggle as the DrawerListener
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
+		mDrawerToggle.setDrawerIndicatorEnabled(false);
+		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		
@@ -330,10 +333,14 @@ public class EventListActivity extends Activity {
 
 		FetchCategoriesTask(ListView listView) {
 			mListView = listView;
+			if(categoriesLoaded) {
+				mEventList.preFetch();
+			}
 		}
 
 		protected Integer doInBackground(Void... voids) {
-			try {				
+			try {
+				
 				return fetchCategories();
 			} catch (Exception e) {
 				// TODO: Error handling
@@ -360,12 +367,22 @@ public class EventListActivity extends Activity {
 				.alpha(1f)
 				.setDuration(300)
 				.setListener(null);
-			} else if (result == -1) {
-				// Update TextView to display connection failure
+				
+				categoriesLoaded = true;
+				mDrawerToggle.setDrawerIndicatorEnabled(true);
+				mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+				
+				mEventList.asyncFetch();
+			} else {
+				mEventList.fetchFailed();
 			}
 			// Move this so it doesn't fetch events if fetching categories fails
-			mEventList.asyncFetch();
+			
 		}
+	}
+	
+	public boolean getCategoriesLoaded() {
+		return categoriesLoaded;
 	}
 
 	public int getCategoryColor(int category) {

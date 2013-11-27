@@ -61,17 +61,25 @@ public class EventListFragment extends Fragment {
 			listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
 			listView.setOnItemClickListener(new ListItemClickListener());
 		}
+		
+		if(!mParent.getCategoriesLoaded()) {
+			preFetch();
+		}
+		
 		return view;
 	}
 
+	public void preFetch() {
+		mLoaded = false;
+		listView.setVisibility(View.GONE);
+		failedText.setVisibility(View.GONE);
+		fetchingText.setAlpha(1f);
+		fetchingText.setVisibility(View.VISIBLE);
+	}
+	
 	public void asyncFetch() {
 		// Make an API call to our web service to get the events
 		try {
-			mLoaded = false;
-			listView.setVisibility(View.GONE);
-			failedText.setVisibility(View.GONE);
-			fetchingText.setAlpha(1f);
-			fetchingText.setVisibility(View.VISIBLE);
 			new FetchEventsTask(listView, fetchingText).execute();
 		} catch (Exception e) {
 			// TODO: Error handling
@@ -224,25 +232,29 @@ public class EventListFragment extends Fragment {
 					}
 				});
 			} else if (result == CONN_FAIL) {
-				failedText.setAlpha(0f);
-				failedText.setVisibility(View.VISIBLE);
-				
-				failedText.animate()
-				.alpha(1f)
-				.setDuration(300)
-				.setListener(null);
-				
-				mLoading.animate()
-				.alpha(0f)
-				.setDuration(300)
-				.setListener(new AnimatorListenerAdapter() {
-					@Override
-					public void onAnimationEnd(Animator animation) {
-						mLoading.setVisibility(View.GONE);
-					}
-				});
+				fetchFailed();
 			}
 		}
+	}
+	
+	public void fetchFailed() {
+		failedText.setAlpha(0f);
+		failedText.setVisibility(View.VISIBLE);
+		
+		failedText.animate()
+		.alpha(1f)
+		.setDuration(300)
+		.setListener(null);
+		
+		fetchingText.animate()
+		.alpha(0f)
+		.setDuration(300)
+		.setListener(new AnimatorListenerAdapter() {
+			@Override
+			public void onAnimationEnd(Animator animation) {
+				fetchingText.setVisibility(View.GONE);
+			}
+		});
 	}
 
 
