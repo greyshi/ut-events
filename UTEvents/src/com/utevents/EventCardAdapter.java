@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class EventCardAdapter extends ArrayAdapter<Event> {
@@ -51,8 +52,16 @@ public class EventCardAdapter extends ArrayAdapter<Event> {
         
         Event event = getItem(position);
         
-        View iv = (View)convertView.findViewById(R.id.color_bar);
-        iv.setBackgroundColor( event.getColor() );
+        int[] colors = event.getColors();
+        LinearLayout ll = (LinearLayout)convertView.findViewById(R.id.color_bar);
+        int height = (int) (5 * ll.getContext().getResources().getDisplayMetrics().density + 0.5f);
+
+        for(int i = 0; i < colors.length; i++) {
+        	View iv = new View(ll.getContext());
+        	iv.setBackgroundColor(colors[i]);
+        	iv.setLayoutParams(new LinearLayout.LayoutParams(0, height, 1.0f/colors.length) );
+        	ll.addView(iv);
+        }
         
         TextView tv = (TextView)convertView.findViewById(R.id.event_title);
         tv.setText( event.getTitle() );

@@ -10,14 +10,14 @@ public class Event implements Serializable {
 	private String location;
 	private String description;
 	private ArrayList<Integer> categories;
-	private int color;
+	private int[] colors;
 	private Date startTime;
 	private Date endTime;
 	
-	Event (String title, ArrayList<Integer> categories, int color, String location, Date startTime, Date endTime, String description) {
+	Event (String title, ArrayList<Integer> categories, int[] colors, String location, Date startTime, Date endTime, String description) {
 		this.title = title;
 		this.categories = categories;
-		this.color = color;
+		this.colors = colors;
 		this.location = location;
 		this.startTime = startTime;
 		this.endTime = endTime;
@@ -72,8 +72,8 @@ public class Event implements Serializable {
 		return categories.contains(category);
 	}
 	
-	public int getColor() {
-		return color;
+	public int[] getColors() {
+		return colors;
 	}
 	
 	public String toString() {

@@ -140,9 +140,11 @@ public class EventListFragment extends Fragment {
 				JSONObject event = jsonEvents.getJSONObject(i);
 				JSONArray catArray = event.getJSONArray("categories");
 				ArrayList<Integer> categories = new ArrayList<Integer>();
+				int[] colors = new int[catArray.length()];
 				for(int k = 0;  k < catArray.length(); k++) {
 					String[] cat = catArray.getString(k).split("/");
 					categories.add(Integer.parseInt(cat[4]));
+					colors[k] = mParent.getCategoryColor(categories.get(k));
 				}
 
 				Date endDate = null;
@@ -162,7 +164,7 @@ public class EventListFragment extends Fragment {
 				events.add(new Event(
 						event.getString("title"),
 						categories,
-						mParent.getCategoryColor(categories.get(0)),
+						colors,
 						event.getString("location"),
 						dateFormat.parse(event.getString("start_time")),
 						endDate,
