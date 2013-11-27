@@ -56,6 +56,7 @@ public class EventListActivity extends Activity {
 	private FetchCategoriesTask fct;
 	private boolean categoriesLoaded = false;
 	private boolean isHome = true;
+	private int selectedEvent = -1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +64,16 @@ public class EventListActivity extends Activity {
 		setContentView(R.layout.activity_event_list);
 
 		if (savedInstanceState != null) {
-			mNavCounter = savedInstanceState.getInt("nav_counter");
+			//mNavCounter = savedInstanceState.getInt("nav_counter");
 			categoriesLoaded = savedInstanceState.getBoolean("categories_loaded");
 			mDefaultTitle = savedInstanceState.getCharSequence("mDefaultTitle");
 			mTitle = savedInstanceState.getCharSequence("title");
 			mDrawerTitle = savedInstanceState.getCharSequence("drawer_title");
-			mTitles = (Stack<CharSequence>)savedInstanceState.getSerializable("titles");
+			//mTitles = (Stack<CharSequence>)savedInstanceState.getSerializable("titles");
 			mCategoryIds = (ArrayList<Integer>)savedInstanceState.getSerializable("category_ids");
 			mCategories = (HashMap<Integer, Category>)savedInstanceState.getSerializable("categories");
 			isHome = savedInstanceState.getBoolean("home");
+			selectedEvent = savedInstanceState.getInt("selected_event");
 		} else {
 			mTitle = mDefaultTitle = getTitle();
 			mDrawerTitle = "Categories";
@@ -131,6 +133,11 @@ public class EventListActivity extends Activity {
 					   .setDuration(300)
 					   .setListener(null);
 	    	
+		    if(selectedEvent != -1) {
+		    	mEventList.setParent(this);
+		    	mEventList.selectEvent(selectedEvent);
+		    }
+		    
 	    } else {
 	    	getFragmentManager().beginTransaction()
 		    					.replace(R.id.content_frame, mEventList)
@@ -158,12 +165,13 @@ public class EventListActivity extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		
-		outState.putInt("nav_counter", mNavCounter);
+		//outState.putInt("nav_counter", mNavCounter);
+		outState.putInt("selected_event", selectedEvent);
 		outState.putBoolean("categories_loaded", categoriesLoaded);
 		outState.putCharSequence("default_title", mDefaultTitle);
 		outState.putCharSequence("title", mTitle);
 		outState.putCharSequence("drawer_title", mDrawerTitle);
-		outState.putSerializable("titles", mTitles);
+		//outState.putSerializable("titles", mTitles);
 		outState.putSerializable("category_ids", mCategoryIds);
 		outState.putSerializable("categories", mCategories);
 		outState.putBoolean("home", isHome);
@@ -210,6 +218,10 @@ public class EventListActivity extends Activity {
 	public void setTitle(CharSequence title) {
 		mTitle = title;
 		getActionBar().setTitle(mTitle);
+	}
+	
+	public void setSelectedEvent(int position) {
+		selectedEvent = position;
 	}
 
 	@Override
@@ -283,9 +295,12 @@ public class EventListActivity extends Activity {
 	private void setHomeStatus(boolean home) {
 		isHome = home;
 		
-		mRefreshButton.setVisible(home);
-		mAddButton.setVisible(home);
-		mSearchButton.setVisible(home);
+		if(mRefreshButton != null)
+			mRefreshButton.setVisible(home);
+		if(mAddButton != null)
+			mAddButton.setVisible(home);
+		if(mSearchButton != null)
+			mSearchButton.setVisible(home);
 		
 		mDrawerToggle.setDrawerIndicatorEnabled(home);
 		if(!home) {
@@ -307,6 +322,7 @@ public class EventListActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
+		selectedEvent = -1;
 		//turn on the Navigation Drawer image; this is called in the LowerLevelFragments
 		if(mNavCounter > 0) {
 			mNavCounter--;

@@ -68,6 +68,10 @@ public class EventListFragment extends Fragment {
 		
 		return view;
 	}
+	
+	public void setParent(EventListActivity parent) {
+		mParent = parent;
+	}
 
 	public void preFetch() {
 		mLoaded = false;
@@ -265,11 +269,12 @@ public class EventListFragment extends Fragment {
 		@Override
 		public void onItemClick(AdapterView parent, View view, int position, long id) {
 			selectEvent(position);
+			mParent.setSelectedEvent(position);
 		}
 	}
 
 	/** Swaps fragments in the main content view */
-	private void selectEvent(int position) {
+	public void selectEvent(int position) {
 		// Create a new fragment
 		Fragment fragment = new EventDetailsFragment();
 		Bundle args = new Bundle();
