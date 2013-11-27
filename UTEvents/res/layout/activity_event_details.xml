@@ -1,115 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<LinearLayout 
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:background="@android:color/white"
+    android:fillViewport="true" >
 
-    <TextView
-        android:id="@+id/event_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:text="Title"
-        android:textSize="22sp"
-        android:textStyle="bold" />
-    <TextView
-        android:id="@+id/event_location_header"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Location"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-	<TextView
-	    android:id="@+id/event_location"
-	    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
-        android:textSize="14sp" />
-    <TextView
-        android:id="@+id/event_start_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Start"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-    <TextView
-	    android:id="@+id/event_start"
-	    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
-        android:textSize="14sp" />
-    <TextView
-        android:id="@+id/event_end_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:text="End"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-    <TextView
-	    android:id="@+id/event_end"
-	    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
-        android:textSize="14sp" />
-    <TextView
-        android:id="@+id/event_description_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Description"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-    <TextView
-	    android:id="@+id/event_description"
-	    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
-        android:textSize="14sp" />
-    <TextView
-        android:id="@+id/event_categories_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Categories"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-    <TextView
-	    android:id="@+id/event_categories"
-	    android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="10dp"
-        android:textSize="14sp" />
-</LinearLayout>
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/color_bar"
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:orientation="horizontal" >
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="Title"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/event_location_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Location"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/event_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/event_start_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Start"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/event_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/event_end_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:text="End"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/event_end"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/event_description_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Description"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/event_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/event_categories_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Categories"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/event_categories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:textSize="14sp" />
+        
+        <View
+            android:background="@android:color/transparent"
+            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_weight="1" />
+        
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#f3f3f3" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#cbcbcb" />
+    </LinearLayout>
+
 </ScrollView>

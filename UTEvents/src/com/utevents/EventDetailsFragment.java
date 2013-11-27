@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class EventDetailsFragment extends Fragment {
@@ -23,6 +24,18 @@ public class EventDetailsFragment extends Fragment {
 		TextView catView = (TextView)view.findViewById(R.id.event_categories);
 		
 		Event event = (Event) getArguments().getSerializable("current_event");
+		
+        int[] colors = event.getColors();
+        LinearLayout ll = (LinearLayout)view.findViewById(R.id.color_bar);
+        int height = (int) (5 * ll.getContext().getResources().getDisplayMetrics().density + 0.5f);
+
+        for(int i = 0; i < colors.length; i++) {
+        	View iv = new View(ll.getContext());
+        	iv.setBackgroundColor(colors[i]);
+        	iv.setLayoutParams(new LinearLayout.LayoutParams(0, height, 1.0f/colors.length) );
+        	ll.addView(iv);
+        }
+        
 		HashMap<Integer, Category> categories = (HashMap<Integer, Category>) getArguments().getSerializable("categories");
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMMMMMMMM dd, yyyy 'at' hh:mma");
