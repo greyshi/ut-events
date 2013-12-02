@@ -23,8 +23,9 @@ The first item (which appears to be two arrows forming a circle) is used to refr
 list of events (i.e., hitting the networked datastore and refreshing the view). The second
 item (which appears to be a magnifying glass) is used to search the events.
 	As an aside, to add an event to the database the following web form must be used:
-http://utevents.herokuapp.com/create. The http://utevents.herokuapp.com site serves as a
-web front-end and back-end server for this app.
+http://utevents.herokuapp.com/create. This site can be easily accessed from inside the app. 
+The http://utevents.herokuapp.com site serves as a web front-end and back-end server for 
+this app.
 
 Completed Features:
 	- Events can be input (via a web form for the time being)
@@ -33,16 +34,16 @@ Completed Features:
 	- Events can be filtered by category
 	- Event submissions are verified as originating from UT students
 	- Searching events works
+	- In-app event submission
+	- Multiple colors for event color-to-group indicators
+	- Timeout/Retry when a network call is sluggish
 
 Uncompleted Features:
-	- In-app event submission
 	- User-defined categories
 	- Calendar View for events
-	- Multiple colors for event color-to-group indicators
 
 New Features:
 	- On-device event cache (for when a network is not available)
-	- Timeout/Retry when a network call is sluggish
 
 External Code:
 	None
