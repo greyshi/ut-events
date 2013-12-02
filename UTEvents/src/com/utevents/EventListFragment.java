@@ -44,7 +44,7 @@ public class EventListFragment extends Fragment {
 	public static final Integer CATEGORIES_ALL = 0;
 	private int mCategory = CATEGORIES_ALL;
 	private EventListActivity mParent;
-	private CharSequence mTitle = "UT Events";
+	private static final CharSequence mTitle = "UT Events";
 	private TextView failedText;
 
 	@Override
@@ -67,6 +67,10 @@ public class EventListFragment extends Fragment {
 		}
 		
 		return view;
+	}
+	
+	public void setParent(EventListActivity parent) {
+		mParent = parent;
 	}
 
 	public void preFetch() {
@@ -265,11 +269,12 @@ public class EventListFragment extends Fragment {
 		@Override
 		public void onItemClick(AdapterView parent, View view, int position, long id) {
 			selectEvent(position);
+			mParent.setSelectedEvent(position);
 		}
 	}
 
 	/** Swaps fragments in the main content view */
-	private void selectEvent(int position) {
+	public void selectEvent(int position) {
 		// Create a new fragment
 		Fragment fragment = new EventDetailsFragment();
 		Bundle args = new Bundle();
@@ -302,8 +307,10 @@ public class EventListFragment extends Fragment {
 		.commit();
 
 		mParent.navigate("Searched For: \"" + keyword + "\"");
-		listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
-		listView.setOnItemClickListener(new ListItemClickListener());
+		if(listView != null) {
+			listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
+			listView.setOnItemClickListener(new ListItemClickListener());
+		}
 	}
 	
 	public void setCategoryFilter(int category) {
@@ -328,5 +335,37 @@ public class EventListFragment extends Fragment {
 				}
 			}
 		}
+	}
+	
+	protected int getCategory() {
+		return mCategory;
+	}
+	
+	protected void setCategory(int c) {
+		mCategory = c;
+	}
+	
+	protected boolean getLoaded() {
+		return mLoaded;
+	}
+	
+	protected void setLoaded(boolean l) {
+		mLoaded = l;
+	}
+	
+	protected ArrayList<Event> getFilteredEvents() {
+		return filteredEvents;
+	}
+	
+	protected void setFilteredEvents(ArrayList<Event> a) {
+		filteredEvents = a;
+	}
+	
+	protected ArrayList<Event> getEvents() {
+		return events;
+	}
+	
+	protected void setEvents(ArrayList<Event> a) {
+		events = a;
 	}
 }
