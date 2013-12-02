@@ -57,7 +57,8 @@ public class EventListActivity extends Activity {
 	private boolean categoriesLoaded = false;
 	private boolean isHome = true;
 	private int selectedEvent = -1;
-	
+	private String mQuery = "";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,11 +75,12 @@ public class EventListActivity extends Activity {
 			mCategories = (HashMap<Integer, Category>)savedInstanceState.getSerializable("categories");
 			isHome = savedInstanceState.getBoolean("home");
 			selectedEvent = savedInstanceState.getInt("selected_event");
+			mQuery = savedInstanceState.getString("search_query");
 		} else {
 			mTitle = mDefaultTitle = getTitle();
 			mDrawerTitle = "Categories";
 		}
-		
+
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerToggle = new ActionBarDrawerToggle(
 				this,                  /* host Activity */
@@ -103,48 +105,53 @@ public class EventListActivity extends Activity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		mDrawerToggle.setDrawerIndicatorEnabled(false);
 		mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-		
+
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
-		
+
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setHomeButtonEnabled(true);
-	    
+
 		mEventList = new EventListFragment();
-		
-	    if (savedInstanceState != null) {
-	    	mEventList.setCategory(savedInstanceState.getInt("category"));
-	    	mEventList.setLoaded(savedInstanceState.getBoolean("loaded"));
-	    	mEventList.setFilteredEvents((ArrayList<Event>)savedInstanceState.getSerializable("filtered_events"));
-	    	mEventList.setEvents((ArrayList<Event>)savedInstanceState.getSerializable("events"));
 
-	    	getFragmentManager().beginTransaction()
-            				    .replace(R.id.content_frame, mEventList)
-            				    .commit();
-	    	
-	    	mDrawerList.setAdapter(new ColorTextAdapter(EventListActivity.this,
-	                R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
-	    	mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+		if (savedInstanceState != null) {
+			mEventList.setCategory(savedInstanceState.getInt("category"));
+			mEventList.setLoaded(savedInstanceState.getBoolean("loaded"));
+			mEventList.setFilteredEvents((ArrayList<Event>)savedInstanceState.getSerializable("filtered_events"));
+			mEventList.setEvents((ArrayList<Event>)savedInstanceState.getSerializable("events"));
 
-	    	mDrawerList.setAlpha(0f);
-	    	mDrawerList.setVisibility(View.VISIBLE);
+			getFragmentManager().beginTransaction()
+			.replace(R.id.content_frame, mEventList)
+			.commit();
 
-	    	mDrawerList.animate()
-					   .alpha(1f)
-					   .setDuration(300)
-					   .setListener(null);
-	    	
-		    if(selectedEvent != -1) {
-		    	mEventList.setParent(this);
-		    	mEventList.selectEvent(selectedEvent);
-		    }
-		    
-	    } else {
-	    	getFragmentManager().beginTransaction()
-		    					.replace(R.id.content_frame, mEventList)
-		    					.commit();
-	    	
-	    	new FetchCategoriesTask(mDrawerList).execute();
-	    }
+			mDrawerList.setAdapter(new ColorTextAdapter(EventListActivity.this,
+					R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
+			mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+			mDrawerList.setAlpha(0f);
+			mDrawerList.setVisibility(View.VISIBLE);
+
+			mDrawerList.animate()
+			.alpha(1f)
+			.setDuration(300)
+			.setListener(null);
+
+			if (mQuery.length() > 0) {
+				mEventList.setParent(this);
+				mEventList.search(mQuery);
+			}
+			if(selectedEvent != -1) {
+				mEventList.setParent(this);
+				mEventList.selectEvent(selectedEvent);
+			}
+
+
+		} else {
+			getFragmentManager().beginTransaction()
+			.replace(R.id.content_frame, mEventList)
+			.commit();
+
+			new FetchCategoriesTask(mDrawerList).execute();
+		}
 	}
 
 
@@ -164,9 +171,10 @@ public class EventListActivity extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		
+
 		//outState.putInt("nav_counter", mNavCounter);
 		outState.putInt("selected_event", selectedEvent);
+		outState.putString("search_query", mQuery);
 		outState.putBoolean("categories_loaded", categoriesLoaded);
 		outState.putCharSequence("default_title", mDefaultTitle);
 		outState.putCharSequence("title", mTitle);
@@ -175,13 +183,13 @@ public class EventListActivity extends Activity {
 		outState.putSerializable("category_ids", mCategoryIds);
 		outState.putSerializable("categories", mCategories);
 		outState.putBoolean("home", isHome);
-		
+
 		outState.putInt("category", mEventList.getCategory());
 		outState.putBoolean("loaded", mEventList.getLoaded());
 		outState.putSerializable("filtered_events", mEventList.getFilteredEvents());
 		outState.putSerializable("events", mEventList.getEvents());
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Pass the event to ActionBarDrawerToggle, if it returns
@@ -191,24 +199,24 @@ public class EventListActivity extends Activity {
 		}
 		// Handle your other action bar items...
 		switch (item.getItemId()) {
-			case android.R.id.home:
-				onBackPressed();
-				return true;    
-			case R.id.refresh:
-				if (fct == null || fct.getStatus() != AsyncTask.Status.RUNNING) {
-					fct = new FetchCategoriesTask(mDrawerList);
-					fct.execute();
-				}
-				break;
-			case R.id.add_event:
-				try {
-					Intent i = Intent.parseUri(CREATE_URI, 0);
-					startActivity(i);
-				} catch (URISyntaxException urise) {
-					// We should never reach this. Display error?
-				}
-				break;
-			default:
+		case android.R.id.home:
+			onBackPressed();
+			return true;    
+		case R.id.refresh:
+			if (fct == null || fct.getStatus() != AsyncTask.Status.RUNNING) {
+				fct = new FetchCategoriesTask(mDrawerList);
+				fct.execute();
+			}
+			break;
+		case R.id.add_event:
+			try {
+				Intent i = Intent.parseUri(CREATE_URI, 0);
+				startActivity(i);
+			} catch (URISyntaxException urise) {
+				// We should never reach this. Display error?
+			}
+			break;
+		default:
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -219,7 +227,7 @@ public class EventListActivity extends Activity {
 		mTitle = title;
 		getActionBar().setTitle(mTitle);
 	}
-	
+
 	public void setSelectedEvent(int position) {
 		selectedEvent = position;
 	}
@@ -227,98 +235,100 @@ public class EventListActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		
+
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.event_list, menu);
 		mRefreshButton = menu.findItem(R.id.refresh);
 		mAddButton = menu.findItem(R.id.add_event);
 		mSearchButton = menu.findItem(R.id.search);
-		
+
 		// Associate searchable configuration with the SearchView
-	    SearchManager searchManager =
-	           (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-	    mSearchView = (SearchView) menu.findItem(R.id.search).getActionView();
-	    mSearchView.setSearchableInfo(
-	            searchManager.getSearchableInfo(getComponentName()));
-	    mSearchView.setOnSearchClickListener(new OnClickListener() {
-	    	@Override
-	    	public void onClick(View v) {
-	    		View view;
-	    		
-	    		view = findViewById(R.id.refresh);
-	    		if (view != null) view.setVisibility(View.GONE);
-	    		
-	    		view = findViewById(R.id.add_event);
-	    		if (view != null) view.setVisibility(View.GONE);
-	    	}
-	    });
-	    mSearchView.setOnCloseListener(new OnCloseListener() {
-	    	@Override
-	    	public boolean onClose() {
-	    		View view;
-	    		
-	    		view = findViewById(R.id.refresh);
-	    		if (view != null) view.setVisibility(View.VISIBLE);
-	    		
-	    		view = findViewById(R.id.add_event);
-	    		if (view != null) view.setVisibility(View.VISIBLE);
-	    		
-	    		return false;
-	    	}
-	    });
-	    
-	    setHomeStatus(isHome);
+		SearchManager searchManager =
+				(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+		mSearchView = (SearchView) menu.findItem(R.id.search).getActionView();
+		mSearchView.setSearchableInfo(
+				searchManager.getSearchableInfo(getComponentName()));
+		mSearchView.setOnSearchClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				View view;
+
+				view = findViewById(R.id.refresh);
+				if (view != null) view.setVisibility(View.GONE);
+
+				view = findViewById(R.id.add_event);
+				if (view != null) view.setVisibility(View.GONE);
+			}
+		});
+		mSearchView.setOnCloseListener(new OnCloseListener() {
+			@Override
+			public boolean onClose() {
+				View view;
+
+				view = findViewById(R.id.refresh);
+				if (view != null) view.setVisibility(View.VISIBLE);
+
+				view = findViewById(R.id.add_event);
+				if (view != null) view.setVisibility(View.VISIBLE);
+
+				return false;
+			}
+		});
+
+		setHomeStatus(isHome);
 
 		return true;
 	}
-	
-	@Override
-    protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
-    }
 
-    private void handleIntent(Intent intent) {
-    	
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search your data somehow
+	@Override
+	protected void onNewIntent(Intent intent) {
+		handleIntent(intent);
+	}
+
+	private void handleIntent(Intent intent) {
+
+		if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+			mQuery = intent.getStringExtra(SearchManager.QUERY);
+
+			//use the query to search your data somehow
 			for(;mNavCounter > 0; mNavCounter--) {
 				getFragmentManager().popBackStack();
 				mTitles.pop();
 			}
-			mEventList.search(query);
+			mEventList.search(mQuery);
 			mSearchView.onActionViewCollapsed();
 			mSearchView.setQuery("", false);
-        }
-    }
-	
+		}
+	}
+
 	private void setHomeStatus(boolean home) {
 		isHome = home;
-		
+
 		if(mRefreshButton != null)
 			mRefreshButton.setVisible(home);
 		if(mAddButton != null)
 			mAddButton.setVisible(home);
 		if(mSearchButton != null)
 			mSearchButton.setVisible(home);
-		
+
 		mDrawerToggle.setDrawerIndicatorEnabled(home);
 		if(!home) {
 			getActionBar().setTitle(mTitles.peek());
 			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 		} else {
+			mQuery = "";
 			mEventList.setCategoryFilter(mEventList.getCategoryFilter());
 			getActionBar().setTitle(mTitle);
 			mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 		}
 	}
-	
+
 	public void navigate(String title) {
 		mNavCounter++;
 		mTitles.push(title);
 		setHomeStatus(mNavCounter == 0);
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
@@ -330,76 +340,76 @@ public class EventListActivity extends Activity {
 		}
 		setHomeStatus(mNavCounter == 0); 
 	}
-	
+
 	private class DrawerItemClickListener implements ListView.OnItemClickListener {
-	    @Override
-	    public void onItemClick(AdapterView parent, View view, int position, long id) {
-	        Category cat = mCategories.get(mCategoryIds.get(position));
-	        if(cat.getId() == EventListFragment.CATEGORIES_ALL) {
-	        	setTitle(mDefaultTitle);
-	        } else {
-	        	setTitle(cat.getTitle());
-	        }
-	        mEventList.setCategoryFilter(cat.getId());
-	        mDrawerLayout.closeDrawers();
-	    }
+		@Override
+		public void onItemClick(AdapterView parent, View view, int position, long id) {
+			Category cat = mCategories.get(mCategoryIds.get(position));
+			if(cat.getId() == EventListFragment.CATEGORIES_ALL) {
+				setTitle(mDefaultTitle);
+			} else {
+				setTitle(cat.getTitle());
+			}
+			mEventList.setCategoryFilter(cat.getId());
+			mDrawerLayout.closeDrawers();
+		}
 	}
-	
+
 	private int fetchCategories() throws Exception {
-			BufferedReader response;
-			String responseLine;
-			StringBuilder responseString = null;
+		BufferedReader response;
+		String responseLine;
+		StringBuilder responseString = null;
 
-			URL url = new URL(CATEGORIES_URI);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		URL url = new URL(CATEGORIES_URI);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-			conn.setConnectTimeout(5000);
-			conn.setReadTimeout(5000);
-			
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept", "application/json");
+		conn.setConnectTimeout(5000);
+		conn.setReadTimeout(5000);
 
-			for (byte i = 0; i < 3; ++i) {
-				try {
-					if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-						response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		
-						responseString = new StringBuilder();
-						while ((responseLine = response.readLine()) != null) {
-							responseString.append(responseLine);
-						}
-		
-						response.close();
-					} else {
-						return -1;
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("Accept", "application/json");
+
+		for (byte i = 0; i < 3; ++i) {
+			try {
+				if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+					response = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+					responseString = new StringBuilder();
+					while ((responseLine = response.readLine()) != null) {
+						responseString.append(responseLine);
 					}
-					
-					break;
-				} catch (SocketTimeoutException ste) {
-					// Could not connect/read to/from server
-					if (i >= 2) return -1;
-				} 
-			}
 
-			// TODO: Support XML. Unmarshal XML from responseString into Event objects and
-			//       stuff those objects into events. (SAX)
-			// 		 Xml.parse(responseString.toString(), null);
+					response.close();
+				} else {
+					return -1;
+				}
 
-			mCategoryIds.clear();
-			mCategoryIds.add(EventListFragment.CATEGORIES_ALL);
-			mCategories.put(EventListFragment.CATEGORIES_ALL, new Category(EventListFragment.CATEGORIES_ALL, "All", ""));
-			JSONObject object = new JSONObject(responseString.toString());
-			JSONArray jsonCategories = object.getJSONArray("objects");
-			for (int i = 0; i < jsonCategories.length(); ++i) {
-				JSONObject category = jsonCategories.getJSONObject(i);
-				int cid = category.getInt("id");
-				// TODO: Handle optional fields (JSONException thrown if a JSONObject
-				//       can't find a value for a key.
-				mCategoryIds.add(cid);
-				mCategories.put(cid, new Category(cid, category.getString("title"), category.getString("color")));
-			}
+				break;
+			} catch (SocketTimeoutException ste) {
+				// Could not connect/read to/from server
+				if (i >= 2) return -1;
+			} 
+		}
 
-			return 1;
+		// TODO: Support XML. Unmarshal XML from responseString into Event objects and
+		//       stuff those objects into events. (SAX)
+		// 		 Xml.parse(responseString.toString(), null);
+
+		mCategoryIds.clear();
+		mCategoryIds.add(EventListFragment.CATEGORIES_ALL);
+		mCategories.put(EventListFragment.CATEGORIES_ALL, new Category(EventListFragment.CATEGORIES_ALL, "All", ""));
+		JSONObject object = new JSONObject(responseString.toString());
+		JSONArray jsonCategories = object.getJSONArray("objects");
+		for (int i = 0; i < jsonCategories.length(); ++i) {
+			JSONObject category = jsonCategories.getJSONObject(i);
+			int cid = category.getInt("id");
+			// TODO: Handle optional fields (JSONException thrown if a JSONObject
+			//       can't find a value for a key.
+			mCategoryIds.add(cid);
+			mCategories.put(cid, new Category(cid, category.getString("title"), category.getString("color")));
+		}
+
+		return 1;
 	}
 
 	private class FetchCategoriesTask extends AsyncTask<Void, Void, Integer> {
@@ -417,7 +427,7 @@ public class EventListActivity extends Activity {
 
 		protected Integer doInBackground(Void... voids) {
 			try {
-				
+
 				return fetchCategories();
 			} catch (Exception e) {
 				// TODO: Error handling
@@ -434,7 +444,7 @@ public class EventListActivity extends Activity {
 				// whatever weight works to fix x events on a page) The parent View for the
 				// events should be scrollable (ListView).
 				mListView.setAdapter(new ColorTextAdapter(EventListActivity.this,
-	                R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
+						R.layout.drawer_list_item, R.id.option_text, mCategoryIds, mCategories));
 				mListView.setOnItemClickListener(new DrawerItemClickListener());
 
 				mListView.setAlpha(0f);
@@ -444,20 +454,20 @@ public class EventListActivity extends Activity {
 				.alpha(1f)
 				.setDuration(300)
 				.setListener(null);
-				
+
 				categoriesLoaded = true;
 				mDrawerToggle.setDrawerIndicatorEnabled(true);
 				mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-				
+
 				mEventList.asyncFetch();
 			} else {
 				mEventList.fetchFailed();
 			}
 			// Move this so it doesn't fetch events if fetching categories fails
-			
+
 		}
 	}
-	
+
 	public boolean getCategoriesLoaded() {
 		return categoriesLoaded;
 	}
@@ -465,7 +475,7 @@ public class EventListActivity extends Activity {
 	public int getCategoryColor(int category) {
 		return mCategories.get(category).getColor();
 	}
-	
+
 	public HashMap<Integer, Category> getAllCategories() {
 		return mCategories;
 	}

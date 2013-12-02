@@ -307,8 +307,10 @@ public class EventListFragment extends Fragment {
 		.commit();
 
 		mParent.navigate("Searched For: \"" + keyword + "\"");
-		listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
-		listView.setOnItemClickListener(new ListItemClickListener());
+		if(listView != null) {
+			listView.setAdapter(new EventCardAdapter(view.getContext(), R.layout.list_item, filteredEvents));
+			listView.setOnItemClickListener(new ListItemClickListener());
+		}
 	}
 	
 	public void setCategoryFilter(int category) {
